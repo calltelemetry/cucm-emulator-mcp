@@ -1,0 +1,71 @@
+{
+  "name": "@calltelemetry/cucm-emulator-mcp",
+  "version": "0.1.0",
+  "description": "OpenAPI-driven Model Context Protocol (MCP) server for Cisco CUCM Emulator with dynamic tool generation and in-memory mock store.",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "bin": {
+    "cucm-emulator-mcp": "./dist/bin/cucm-emulator-mcp.js"
+  },
+  "files": [
+    "dist",
+    "contracts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && chmod +x dist/bin/*.js 2>/dev/null || true",
+    "typecheck": "tsc --noEmit",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run test/e2e",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && npm run test",
+    "start": "node dist/bin/cucm-emulator-mcp.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calltelemetry/cucm-emulator-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cucm",
+    "cisco",
+    "emulator",
+    "telephony",
+    "openapi",
+    "axl",
+    "risport",
+    "curri",
+    "cdr"
+  ],
+  "author": "Call Telemetry",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0",
+    "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "undici": "^7.4.0",
+    "yaml": "^2.8.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "@vitest/coverage-v8": "^3.0.7",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
