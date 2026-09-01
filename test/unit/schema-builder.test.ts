@@ -3,6 +3,7 @@ import {
   buildOperationSchema,
   deriveToolName,
   jsonSchemaToZod,
+  sanitizeMcpToolName,
   toSnakeCase,
 } from "../../src/openapi/schema-builder.js";
 import type { OpenApiOperation, OpenApiSpec } from "../../src/openapi/types.js";
@@ -18,6 +19,8 @@ describe("Schema Builder & Parameter Merger (schema-builder.ts)", () => {
     expect(deriveToolName("getSummary")).toBe("emu_get_summary");
     expect(deriveToolName("emu_simulate_call")).toBe("emu_simulate_call");
     expect(deriveToolName(undefined, "POST", "/api/v2/inventory/{resource}")).toBe("emu_post_inventory_by_resource");
+    expect(sanitizeMcpToolName("emu_post_logcollectionservice2_services_log_collection_port_type_service").length).toBeLessThanOrEqual(64);
+    expect(deriveToolName("postLogCollectionService2ServicesLogCollectionPortTypeService").length).toBeLessThanOrEqual(64);
   });
 
   it("converts JSON Schema types to Zod schemas", () => {

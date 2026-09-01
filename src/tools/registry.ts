@@ -142,7 +142,7 @@ export class ToolRegistry {
    * Loads or reloads dynamic tools from an OpenAPI specification, preserving domain tools,
    * and fires tool change notifications.
    */
-  public reloadFromSpec(spec: OpenApiSpec): void {
+  public reloadFromSpec(spec: OpenApiSpec, options: { notify?: boolean } = {}): void {
     // 1. Re-register domain tools
     for (const domainTool of allDomainTools) {
       this.tools.set(domainTool.name, domainTool);
@@ -157,7 +157,9 @@ export class ToolRegistry {
       }
     }
 
-    // 3. Dispatch change notification
-    this.notifyToolsChanged();
+    // Skip notify on first load — Cursor discovery fails if tools/list_changed races tools/list.
+    if (options.notify !== false) {
+      this.notifyToolsChanged();
+    }
   }
 }

@@ -397,6 +397,17 @@ export class InMemoryCucmStore {
       };
     }
 
+    if (path.includes("Screenshot") || path.includes("lcd.bmp")) {
+      return {
+        phoneName: phone.name,
+        ipAddress: phone.ipAddress,
+        path,
+        contentType: "image/bmp",
+        encoding: "base64",
+        bodyBase64: Buffer.from("BM").toString("base64"),
+      };
+    }
+
     if (path.includes("DeviceInformation") || path.includes("info")) {
       return {
         phoneName: phone.name,

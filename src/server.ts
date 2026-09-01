@@ -61,7 +61,7 @@ export class CucmEmulatorMcpServer {
     this.server = new Server(
       {
         name: "@calltelemetry/cucm-emulator-mcp",
-        version: "0.1.0",
+        version: "0.1.2",
       },
       {
         capabilities: {
@@ -150,7 +150,7 @@ export class CucmEmulatorMcpServer {
 
     // 3. Populate and overlay dynamic tools from OpenAPI spec
     if (this.spec) {
-      this.registry.reloadFromSpec(this.spec);
+      this.registry.reloadFromSpec(this.spec, { notify: false });
     }
 
     this.isInitialized = true;

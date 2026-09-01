@@ -11,6 +11,7 @@ import {
   emuListPhonesTool,
   emuSetPhoneStatusTool,
   emuGetPhoneWebTool,
+  emuGetPhoneScreenshotTool,
   emuSimulateCallTool,
   emuCallActionTool,
   emuListActiveCallsTool,
@@ -20,7 +21,7 @@ import {
   emuGetCdrHistoryTool,
 } from "../../../src/tools/domains/index.js";
 
-describe("Discrete Domain Tools (15 Tools)", () => {
+describe("Discrete Domain Tools (16 Tools)", () => {
   let store: InMemoryCucmStore;
   let client: DirectStoreCucmClient;
 
@@ -29,10 +30,11 @@ describe("Discrete Domain Tools (15 Tools)", () => {
     client = new DirectStoreCucmClient(store);
   });
 
-  it("contains exactly 15 discrete domain tools", () => {
-    expect(allDomainTools).toHaveLength(15);
+  it("contains exactly 16 discrete domain tools", () => {
+    expect(allDomainTools).toHaveLength(16);
     const names = allDomainTools.map((t) => t.name);
-    expect(new Set(names).size).toBe(15);
+    expect(new Set(names).size).toBe(16);
+    expect(names).toContain("emu_get_phone_screenshot");
   });
 
   // 1. Fixtures Tools
@@ -113,6 +115,20 @@ describe("Discrete Domain Tools (15 Tools)", () => {
       expect(res.isError).toBeFalsy();
       const web = JSON.parse(res.content[0].text);
       expect(web.phoneName).toBe(targetPhone);
+    });
+
+    it("emu_get_phone_screenshot fetches CGI/Screenshot from the emulated-phone surface", async () => {
+      const phones = (await client.listInventory("phones")) as any[];
+      const targetPhone = phones[0].name;
+
+      const res = await emuGetPhoneScreenshotTool.execute(
+        { phoneNameOrIp: targetPhone },
+        client
+      );
+      expect(res.isError).toBeFalsy();
+      const web = JSON.parse(res.content[0].text);
+      expect(web.phoneName).toBe(targetPhone);
+      expect(web.contentType).toBe("image/bmp");
     });
   });
 
