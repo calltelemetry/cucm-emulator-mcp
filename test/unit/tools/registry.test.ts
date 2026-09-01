@@ -14,8 +14,8 @@ describe("ToolRegistry", () => {
     client = new DirectStoreCucmClient(new InMemoryCucmStore());
   });
 
-  it("initializes with 15 domain tools", () => {
-    expect(registry.size).toBe(15);
+  it("initializes with 16 domain tools", () => {
+    expect(registry.size).toBe(16);
     expect(registry.hasTool("emu_seed_fixtures")).toBe(true);
     expect(registry.hasTool("emu_simulate_call")).toBe(true);
   });

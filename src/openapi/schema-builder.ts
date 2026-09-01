@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type {
   MergedOperationSchema,
@@ -7,6 +8,22 @@ import type {
   OpenApiSpec,
 } from "./types.js";
 import { dereferenceSchema } from "./deref.js";
+
+/** MCP tool names must match ^[a-zA-Z0-9_-]{1,64}$ or Cursor rejects the whole tools/list. */
+export const MCP_TOOL_NAME_MAX = 64;
+
+export function sanitizeMcpToolName(name: string): string {
+  let sanitized = name
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  if (!sanitized) sanitized = "emu_tool";
+  if (!sanitized.startsWith("emu_")) sanitized = `emu_${sanitized}`;
+  if (sanitized.length <= MCP_TOOL_NAME_MAX) return sanitized;
+  const digest = createHash("sha1").update(name).digest("hex").slice(0, 8);
+  const budget = MCP_TOOL_NAME_MAX - 1 - digest.length;
+  return `${sanitized.slice(0, budget)}_${digest}`;
+}
 
 /**
  * Converts camelCase or kebab-case to snake_case.
@@ -24,7 +41,7 @@ export function toSnakeCase(str: string): string {
 export function deriveToolName(operationId?: string, method = "GET", pathTemplate = ""): string {
   if (operationId) {
     const snake = toSnakeCase(operationId);
-    return snake.startsWith("emu_") ? snake : `emu_${snake}`;
+    return sanitizeMcpToolName(snake.startsWith("emu_") ? snake : `emu_${snake}`);
   }
 
   // Fallback: derive from method and path
@@ -33,7 +50,9 @@ export function deriveToolName(operationId?: string, method = "GET", pathTemplat
     .replace(/\{([^}]+)\}/g, "by_$1")
     .replace(/[^a-zA-Z0-9_]/g, "_");
 
-  return `emu_${toSnakeCase(method)}_${toSnakeCase(sanitizedPath)}`.replace(/_+/g, "_");
+  return sanitizeMcpToolName(
+    `emu_${toSnakeCase(method)}_${toSnakeCase(sanitizedPath)}`.replace(/_+/g, "_")
+  );
 }
 
 /**

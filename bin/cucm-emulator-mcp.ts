@@ -13,10 +13,10 @@ const program = new Command();
 program
   .name("cucm-emulator-mcp")
   .description("OpenAPI-driven Model Context Protocol (MCP) server for Cisco CUCM Emulator")
-  .version("0.1.0", "-v, --version", "Output the current version")
+  .version("0.1.2", "-v, --version", "Output the current version")
   .option("-t, --transport <type>", "Transport type (stdio or sse)", "stdio")
   .option("-p, --port <number>", "HTTP port for SSE transport", "3000")
-  .option("-h, --host <host>", "Host interface to bind SSE transport", "127.0.0.1")
+  .option("--bind-host <host>", "Host interface to bind SSE transport", "127.0.0.1")
   .option("-u, --target-url <url>", "Target live CUCM emulator URL (e.g. http://192.168.124.105:8443)")
   .option("-s, --spec-path <path>", "Path or URL to OpenAPI 3.1.0 specification")
   .option("-m, --mock", "Force in-memory mock store mode", false)
@@ -29,7 +29,7 @@ program
         config: {
           transport: options.transport,
           port: parseInt(options.port, 10),
-          host: options.host,
+          host: options.bindHost,
           targetUrl: options.targetUrl,
           specPath: options.specPath,
           mock: options.mock,

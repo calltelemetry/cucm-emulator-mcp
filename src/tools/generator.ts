@@ -4,6 +4,13 @@ import { parseAllOperations } from "../openapi/parser.js";
 import type { McpTool, McpToolResult } from "./types.js";
 import { inferToolAnnotations } from "./annotations.js";
 
+/** Agent-facing control plane: v2 HTTP + emulated-phone CGI. Do not surface SOAP AXL/RIS/DIME. */
+const AGENT_FACING_PATH = /^\/(api\/v\d+|emulated-phone(?:-ip)?|healthz|contracts)(\/|$)/;
+
+export function isAgentFacingPath(pathTemplate: string): boolean {
+  return AGENT_FACING_PATH.test(pathTemplate);
+}
+
 /**
  * Compiles a single MergedOperationSchema from the OpenAPI engine into a discrete MCP tool.
  */
@@ -61,6 +68,7 @@ export function generateDynamicToolsFromSpec(spec: OpenApiSpec): McpTool[] {
   for (const [key, schema] of operations.entries()) {
     // Only register once per canonical toolName
     if (key === schema.toolName && !registeredNames.has(schema.toolName)) {
+      if (!isAgentFacingPath(schema.pathTemplate)) continue;
       registeredNames.add(schema.toolName);
       tools.push(generateToolFromOperation(schema));
     }

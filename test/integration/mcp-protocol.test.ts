@@ -39,6 +39,7 @@ describe("Integration: MCP JSON-RPC 2.0 Protocol Compliance", () => {
     expect(toolNames.has("emu_list_phones")).toBe(true);
     expect(toolNames.has("emu_set_phone_status")).toBe(true);
     expect(toolNames.has("emu_get_phone_web")).toBe(true);
+    expect(toolNames.has("emu_get_phone_screenshot")).toBe(true);
     expect(toolNames.has("emu_simulate_call")).toBe(true);
     expect(toolNames.has("emu_call_action")).toBe(true);
     expect(toolNames.has("emu_list_active_calls")).toBe(true);

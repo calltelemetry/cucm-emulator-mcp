@@ -136,8 +136,46 @@ export const emuGetPhoneWebTool: McpTool = {
   },
 };
 
+export const emuGetPhoneScreenshotTool: McpTool = {
+  name: "emu_get_phone_screenshot",
+  description:
+    "Fetches the Cisco IP Phone CGI screenshot from /emulated-phone/{name}/CGI/Screenshot (BMP when authenticated; CiscoIPPhoneError Number=4 without auth on the live emulator).",
+  inputSchema: {
+    type: "object",
+    properties: {
+      phoneNameOrIp: {
+        type: "string",
+        description: "Device name (e.g. SEP001122334455) or IP address of the target phone",
+      },
+      path: {
+        type: "string",
+        description: "Screenshot path on the phone web server (default: /CGI/Screenshot)",
+      },
+    },
+    required: ["phoneNameOrIp"],
+    additionalProperties: false,
+  },
+  annotations: inferToolAnnotations("emu_get_phone_screenshot", "GET", ["phones"]),
+  async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
+    try {
+      const phoneNameOrIp = String(args.phoneNameOrIp);
+      const path = args.path ? String(args.path) : "/CGI/Screenshot";
+      const result = await client.getPhoneWeb(phoneNameOrIp, path, "bmp");
+      return {
+        content: [{ type: "text", text: typeof result === "string" ? result : JSON.stringify(result, null, 2) }],
+      };
+    } catch (err: any) {
+      return {
+        content: [{ type: "text", text: err?.message || String(err) }],
+        isError: true,
+      };
+    }
+  },
+};
+
 export const phonesDomainTools: McpTool[] = [
   emuListPhonesTool,
   emuSetPhoneStatusTool,
   emuGetPhoneWebTool,
+  emuGetPhoneScreenshotTool,
 ];

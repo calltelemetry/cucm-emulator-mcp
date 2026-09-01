@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { loadOpenApiSpec } from "../../../src/openapi/parser.js";
-import { generateDynamicToolsFromSpec, generateDynamicToolsMap } from "../../../src/tools/generator.js";
+import { generateDynamicToolsFromSpec, generateDynamicToolsMap, isAgentFacingPath } from "../../../src/tools/generator.js";
 import { DirectStoreCucmClient } from "../../../src/client/mock-client.js";
 import { InMemoryCucmStore } from "../../../src/mock/store.js";
 import type { OpenApiSpec } from "../../../src/openapi/types.js";
@@ -21,12 +21,23 @@ describe("Dynamic Tool Generator", () => {
     expect(tools.length).toBeGreaterThanOrEqual(40);
 
     for (const tool of tools) {
+      expect(tool.name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/);
       expect(tool.name).toMatch(/^emu_/);
       expect(tool.description).toBeDefined();
       expect(tool.inputSchema).toBeDefined();
       expect(tool.inputSchema.type).toBe("object");
       expect(tool.annotations).toBeDefined();
     }
+  });
+
+  it("excludes SOAP AXL/RIS/DIME paths from the agent-facing catalog", () => {
+    expect(isAgentFacingPath("/api/v2/summary")).toBe(true);
+    expect(isAgentFacingPath("/emulated-phone/{name}/CGI/Screenshot")).toBe(true);
+    expect(isAgentFacingPath("/axl/")).toBe(false);
+    expect(isAgentFacingPath("/realtimeservice2/services/RISService70")).toBe(false);
+    const tools = generateDynamicToolsFromSpec(spec);
+    expect(tools.some((tool) => tool.name.includes("log_collection"))).toBe(false);
+    expect(tools.some((tool) => tool.name === "emu_post_axl_")).toBe(false);
   });
 
   it("creates keyed map of dynamic tools", () => {
