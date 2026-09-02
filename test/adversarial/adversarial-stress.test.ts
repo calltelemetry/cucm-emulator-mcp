@@ -514,25 +514,37 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
         );
 
         let stderr = "";
-        proc.stderr.on("data", (d) => (stderr += d.toString()));
+        let started = false;
+        const timeout = setTimeout(() => {
+          proc.kill("SIGKILL");
+          reject(new Error(`Timeout waiting for SSE listen. Stderr: "${stderr}"`));
+        }, 8000);
 
-        setTimeout(async () => {
+        const probe = async () => {
           try {
             const healthRes = await fetch(`http://127.0.0.1:${testPort}/health`);
             expect(healthRes.ok).toBe(true);
-
             const json = (await healthRes.json()) as any;
             expect(json.status).toBe("ok");
             expect(json.transport).toBe("sse");
             expect(json.mode).toBe("mock");
-
+            clearTimeout(timeout);
             proc.kill("SIGTERM");
             resolve();
           } catch (err) {
+            clearTimeout(timeout);
             proc.kill("SIGKILL");
             reject(err);
           }
-        }, 600);
+        };
+
+        proc.stderr.on("data", (d) => {
+          stderr += d.toString();
+          if (!started && stderr.includes("Healthcheck endpoint")) {
+            started = true;
+            void probe();
+          }
+        });
       });
     });
   });
