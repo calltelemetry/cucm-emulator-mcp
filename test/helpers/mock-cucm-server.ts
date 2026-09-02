@@ -169,6 +169,7 @@ export class MockCucmServer {
   }
 
   private initMiddleware(): void {
+    this.app.use(express.text({ type: ["text/xml", "application/xml"], limit: "20mb" }));
     this.app.use(express.json({ limit: "20mb" }));
     this.app.use(express.urlencoded({ extended: true }));
 
@@ -247,11 +248,22 @@ export class MockCucmServer {
     this.app.get(["/api/openapi.json", "/api/v2/openapi.json"], (_req: Request, res: Response) => {
       const contractPath = path.resolve(__dirname, "../../contracts/openapi.json");
       if (fs.existsSync(contractPath)) {
-        res.sendFile(contractPath);
+        res.type("application/json").send(fs.readFileSync(contractPath, "utf-8"));
       } else {
-        res.json({ openapi: "3.1.0", info: { title: "Mock CUCM Emulator", version: "0.1.0" } });
+        res.status(404).json({ error: "OpenAPI spec not bundled" });
       }
     });
+
+    const soapEcho = (service: string) => (req: Request, res: Response) => {
+      const envelope = typeof req.body === "string" ? req.body : "";
+      res.type("text/xml").send(
+        `<soapenv:Envelope><soapenv:Body><ns1:${service}Response>${envelope.slice(0, 120)}</ns1:${service}Response></soapenv:Body></soapenv:Envelope>`
+      );
+    };
+    this.app.post(["/axl/", "/axl"], soapEcho("getUser"));
+    this.app.post("/realtimeservice2/services/RISService70", soapEcho("selectCmDevice"));
+    this.app.post("/logcollectionservice2/services/LogCollectionPortTypeService", soapEcho("selectLogFiles"));
+    this.app.post("/logcollectionservice/services/DimeGetFileService", soapEcho("GetOneFile"));
 
     // 2. Topology
     this.app.get(["/api/topology", "/api/v2/topology"], (_req: Request, res: Response) => {

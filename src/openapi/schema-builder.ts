@@ -12,6 +12,32 @@ import { dereferenceSchema } from "./deref.js";
 /** MCP tool names must match ^[a-zA-Z0-9_-]{1,64}$ or Cursor rejects the whole tools/list. */
 export const MCP_TOOL_NAME_MAX = 64;
 
+/**
+ * SOAP AXL/RIS/DIME stay on the emulator's existing SOAP HTTP paths.
+ * Path-derived names for LogCollectionPortTypeService are 72 chars and fail Cursor discovery.
+ */
+export const SOAP_SHORT_ALIASES: Record<string, string> = {
+  "/axl/": "emu_axl",
+  "/realtimeservice2/services/RISService70": "emu_ris",
+  "/logcollectionservice2/services/LogCollectionPortTypeService": "emu_dime",
+  "/logcollectionservice/services/DimeGetFileService": "emu_dime_file",
+};
+
+export function soapShortAlias(pathTemplate: string): string | undefined {
+  return SOAP_SHORT_ALIASES[pathTemplate];
+}
+
+export function isSoapEndpoint(endpoint: string): boolean {
+  const path = endpoint.split("?")[0];
+  if (SOAP_SHORT_ALIASES[path]) return true;
+  return (
+    path === "/axl" ||
+    path.startsWith("/axl/") ||
+    path.startsWith("/realtimeservice") ||
+    path.startsWith("/logcollectionservice")
+  );
+}
+
 export function sanitizeMcpToolName(name: string): string {
   let sanitized = name
     .replace(/[^a-zA-Z0-9_-]/g, "_")
@@ -39,6 +65,9 @@ export function toSnakeCase(str: string): string {
  * Derives a clean tool name from operationId or method+path.
  */
 export function deriveToolName(operationId?: string, method = "GET", pathTemplate = ""): string {
+  const alias = soapShortAlias(pathTemplate);
+  if (alias) return alias;
+
   if (operationId) {
     const snake = toSnakeCase(operationId);
     return sanitizeMcpToolName(snake.startsWith("emu_") ? snake : `emu_${snake}`);
@@ -231,7 +260,11 @@ export function buildOperationSchema(
       content?: Record<string, { schema?: OpenApiSchema }>;
     };
 
-    const jsonContent = derefedBody.content?.["application/json"] || derefedBody.content?.["*/*"];
+    const jsonContent =
+      derefedBody.content?.["application/json"] ||
+      derefedBody.content?.["*/*"] ||
+      derefedBody.content?.["text/xml"] ||
+      derefedBody.content?.["application/xml"];
     if (jsonContent?.schema) {
       hasBody = true;
       const bodySchema = dereferenceSchema(jsonContent.schema, derefCtx) as OpenApiSchema;

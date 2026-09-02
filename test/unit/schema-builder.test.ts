@@ -19,6 +19,10 @@ describe("Schema Builder & Parameter Merger (schema-builder.ts)", () => {
     expect(deriveToolName("getSummary")).toBe("emu_get_summary");
     expect(deriveToolName("emu_simulate_call")).toBe("emu_simulate_call");
     expect(deriveToolName(undefined, "POST", "/api/v2/inventory/{resource}")).toBe("emu_post_inventory_by_resource");
+    expect(deriveToolName(undefined, "POST", "/axl/")).toBe("emu_axl");
+    expect(deriveToolName(undefined, "POST", "/realtimeservice2/services/RISService70")).toBe("emu_ris");
+    expect(deriveToolName(undefined, "POST", "/logcollectionservice2/services/LogCollectionPortTypeService")).toBe("emu_dime");
+    expect(deriveToolName(undefined, "POST", "/logcollectionservice/services/DimeGetFileService")).toBe("emu_dime_file");
     expect(sanitizeMcpToolName("emu_post_logcollectionservice2_services_log_collection_port_type_service").length).toBeLessThanOrEqual(64);
     expect(deriveToolName("postLogCollectionService2ServicesLogCollectionPortTypeService").length).toBeLessThanOrEqual(64);
   });

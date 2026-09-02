@@ -1,14 +1,17 @@
 import type { ICucmEmulatorClient } from "../client/interface.js";
 import type { MergedOperationSchema, OpenApiSpec } from "../openapi/types.js";
 import { parseAllOperations } from "../openapi/parser.js";
+import { soapShortAlias } from "../openapi/schema-builder.js";
 import type { McpTool, McpToolResult } from "./types.js";
 import { inferToolAnnotations } from "./annotations.js";
 
-/** Agent-facing control plane: v2 HTTP + emulated-phone CGI. Do not surface SOAP AXL/RIS/DIME. */
+export { SOAP_SHORT_ALIASES, soapShortAlias } from "../openapi/schema-builder.js";
+
+/** Agent-facing control plane: v2 HTTP + emulated-phone CGI. SOAP AXL/RIS/DIME via short aliases. */
 const AGENT_FACING_PATH = /^\/(api\/v\d+|emulated-phone(?:-ip)?|healthz|contracts)(\/|$)/;
 
 export function isAgentFacingPath(pathTemplate: string): boolean {
-  return AGENT_FACING_PATH.test(pathTemplate);
+  return AGENT_FACING_PATH.test(pathTemplate) || Boolean(soapShortAlias(pathTemplate));
 }
 
 /**

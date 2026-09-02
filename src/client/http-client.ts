@@ -16,6 +16,7 @@ import {
   ToolExecutionError,
   ValidationError,
 } from "../types/errors.js";
+import { isSoapEndpoint } from "../openapi/schema-builder.js";
 
 export interface HttpCucmClientOptions {
   targetUrl: string;
@@ -66,8 +67,9 @@ export class HttpCucmClient implements ICucmEmulatorClient {
       }
     }
 
+    const soap = isSoapEndpoint(endpoint);
     const headers: Record<string, string> = {
-      Accept: "application/json, text/plain, */*",
+      Accept: soap ? "text/xml, multipart/related, */*" : "application/json, text/plain, */*",
     };
 
     if (this.authToken) {
@@ -76,8 +78,13 @@ export class HttpCucmClient implements ICucmEmulatorClient {
 
     let payload: string | undefined;
     if (body !== undefined) {
-      headers["Content-Type"] = "application/json";
-      payload = JSON.stringify(body);
+      if (soap && typeof body === "string") {
+        headers["Content-Type"] = "text/xml; charset=utf-8";
+        payload = body;
+      } else {
+        headers["Content-Type"] = "application/json";
+        payload = JSON.stringify(body);
+      }
     }
 
     let lastError: Error | undefined;
