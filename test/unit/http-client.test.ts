@@ -101,4 +101,15 @@ describe("HTTP Client (http-client.ts)", () => {
     expect(res).toBeDefined();
     expect(res.name).toBe("CUCM-PUB");
   });
+
+  it("posts SOAP envelopes as text/xml to AXL/RIS/DIME paths", async () => {
+    const envelope =
+      "<soapenv:Envelope><soapenv:Body><ns1:getUser><userid>demo</userid></ns1:getUser></soapenv:Body></soapenv:Envelope>";
+    const res = (await client.executeGenericOperation("POST", "/axl/", { body: envelope })) as string;
+    expect(res).toContain("getUserResponse");
+    expect(res).toContain("userid>demo");
+    const last = mockServer.getRequestHistory().at(-1);
+    expect(last?.path).toMatch(/\/axl\/?$/);
+    expect(String(last?.headers["content-type"] || "")).toMatch(/text\/xml/);
+  });
 });

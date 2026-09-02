@@ -132,6 +132,16 @@ cucm-emulator-mcp --transport sse --port 3000 --host 127.0.0.1
 - `emu_generate_cdrs`: Generates batches of synthetic CDR records (normal, abandoned, curri-blocked, burst).
 - `emu_get_cdr_history`: Retrieves recent CDR records in structured JSON or raw Cisco CSV export format.
 
+### SOAP AXL / RIS / DIME (short aliases)
+Cursor rejects any MCP `tools/list` that contains a name longer than 64 characters. The DIME log-collection path otherwise compiles to a 72-character name, which dropped the whole SOAP surface in 0.1.2. These aliases post the same emulator SOAP endpoints (no second HTTP API):
+
+- `emu_axl`: `POST /axl/` (AXL envelope in `body`)
+- `emu_ris`: `POST /realtimeservice2/services/RISService70`
+- `emu_dime`: `POST /logcollectionservice2/services/LogCollectionPortTypeService`
+- `emu_dime_file`: `POST /logcollectionservice/services/DimeGetFileService`
+
+Inventory, CGI, and screenshots stay on v2 HTTP / `emu_get_phone_*`.
+
 ## Development & Verification
 
 ```bash

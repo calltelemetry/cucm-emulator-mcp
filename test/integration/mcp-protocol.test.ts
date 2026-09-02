@@ -51,6 +51,13 @@ describe("Integration: MCP JSON-RPC 2.0 Protocol Compliance", () => {
     // Verify presence of dynamic OpenAPI tools
     expect(toolNames.has("emu_get_summary")).toBe(true);
     expect(toolNames.has("emu_get_topology")).toBe(true);
+    expect(toolNames.has("emu_axl")).toBe(true);
+    expect(toolNames.has("emu_ris")).toBe(true);
+    expect(toolNames.has("emu_dime")).toBe(true);
+    expect(toolNames.has("emu_dime_file")).toBe(true);
+    for (const tool of tools) {
+      expect(tool.name.length).toBeLessThanOrEqual(64);
+    }
   });
 
   it("executes discrete domain tools over standard MCP JSON-RPC protocol", async () => {

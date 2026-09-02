@@ -30,14 +30,26 @@ describe("Dynamic Tool Generator", () => {
     }
   });
 
-  it("excludes SOAP AXL/RIS/DIME paths from the agent-facing catalog", () => {
+  it("exposes SOAP AXL/RIS/DIME as short aliases under the 64-character Cursor limit", () => {
     expect(isAgentFacingPath("/api/v2/summary")).toBe(true);
     expect(isAgentFacingPath("/emulated-phone/{name}/CGI/Screenshot")).toBe(true);
-    expect(isAgentFacingPath("/axl/")).toBe(false);
-    expect(isAgentFacingPath("/realtimeservice2/services/RISService70")).toBe(false);
+    expect(isAgentFacingPath("/axl/")).toBe(true);
+    expect(isAgentFacingPath("/realtimeservice2/services/RISService70")).toBe(true);
+    expect(isAgentFacingPath("/logcollectionservice2/services/LogCollectionPortTypeService")).toBe(true);
+    expect(isAgentFacingPath("/logcollectionservice/services/DimeGetFileService")).toBe(true);
     const tools = generateDynamicToolsFromSpec(spec);
+    const names = tools.map((tool) => tool.name);
+    expect(names).toContain("emu_axl");
+    expect(names).toContain("emu_ris");
+    expect(names).toContain("emu_dime");
+    expect(names).toContain("emu_dime_file");
     expect(tools.some((tool) => tool.name.includes("log_collection"))).toBe(false);
     expect(tools.some((tool) => tool.name === "emu_post_axl_")).toBe(false);
+    for (const name of ["emu_axl", "emu_ris", "emu_dime", "emu_dime_file"]) {
+      expect(name.length).toBeLessThanOrEqual(64);
+    }
+    const dime = tools.find((tool) => tool.name === "emu_dime");
+    expect(dime?.inputSchema.properties).toHaveProperty("body");
   });
 
   it("creates keyed map of dynamic tools", () => {
