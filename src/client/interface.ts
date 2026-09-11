@@ -24,7 +24,7 @@ export interface ICucmEmulatorClient {
   patchInventory(resource: string, id: string, payload: Record<string, unknown>): Promise<unknown>;
   deleteInventory(resource: string, id: string): Promise<boolean>;
 
-  setNodeStatus(nodeName: string, role?: string, risReturnCode?: string): Promise<unknown>;
+  setNodeStatus(nodeName: string, role?: string, risReturnCode?: string, version?: string): Promise<unknown>;
   setPhoneStatus(phoneName: string, status: string): Promise<unknown>;
 
   simulateCall(input: SimulateCallInput): Promise<SimulatedCallResult>;

@@ -71,6 +71,11 @@ export const emuSetNodeStatusTool: McpTool = {
         enum: ["Ok", "NotFound", "SearchLimitExceeded", "ZeroRecordsFound", "Timeout", "NullPointer"],
         description: "Direct RIS return code (alternative to status)",
       },
+      version: {
+        type: "string",
+        enum: ["11.0", "11.5", "12.0", "12.5", "14.0", "15.0"],
+        description: "CUCM version to assign to the node (e.g. for testing version upgrades or cluster version changes)",
+      },
     },
     required: ["nodeName"],
     additionalProperties: false,
@@ -81,7 +86,8 @@ export const emuSetNodeStatusTool: McpTool = {
       const nodeName = String(args.nodeName);
       const role = args.role ? String(args.role) : undefined;
       const statusOrCode = args.status || args.risReturnCode || "Ok";
-      const result = await client.setNodeStatus(nodeName, role, String(statusOrCode));
+      const version = args.version ? String(args.version) : undefined;
+      const result = await client.setNodeStatus(nodeName, role, String(statusOrCode), version);
       return {
         content: [{ type: "text", text: typeof result === "string" ? result : JSON.stringify(result, null, 2) }],
       };

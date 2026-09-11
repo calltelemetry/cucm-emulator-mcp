@@ -65,9 +65,10 @@ export class DirectStoreCucmClient implements ICucmEmulatorClient {
   public async setNodeStatus(
     nodeName: string,
     role?: string,
-    risReturnCode = "Ok"
+    risReturnCode = "Ok",
+    version?: string
   ): Promise<unknown> {
-    return this.store.setNodeStatus(nodeName, role as any, risReturnCode as any);
+    return this.store.setNodeStatus(nodeName, role as any, risReturnCode as any, version as any);
   }
 
   public async setPhoneStatus(phoneName: string, status: string): Promise<unknown> {
@@ -146,6 +147,12 @@ export class DirectStoreCucmClient implements ICucmEmulatorClient {
     const httpMethod = method.toUpperCase();
     const cleanPath = pathTemplate.replace(/^\/api\/v\d+\//, "");
 
+    const versionOverride = (params.cucm_version || params.version) as SupportedAxlVersion | undefined;
+    if (versionOverride && (cleanPath === "cluster/version" || cleanPath === "version")) {
+      this.store.setVersion(versionOverride);
+      return { version: this.store.version };
+    }
+
     if (cleanPath === "summary") {
       return this.getSummary();
     }
@@ -163,6 +170,9 @@ export class DirectStoreCucmClient implements ICucmEmulatorClient {
         return this.upsertInventory(resource, params);
       }
       if (httpMethod === "PATCH" && id) {
+        if (resource === "nodes" && versionOverride) {
+          this.store.setVersion(versionOverride);
+        }
         return this.patchInventory(resource, id, params);
       }
       if (httpMethod === "DELETE" && id) {

@@ -112,4 +112,55 @@ describe("HTTP Client (http-client.ts)", () => {
     expect(last?.path).toMatch(/\/axl\/?$/);
     expect(String(last?.headers["content-type"] || "")).toMatch(/text\/xml/);
   });
+
+  it("supports in-flight auth_token override without altering client configuration", async () => {
+    // Client initialized with invalid credentials
+    const badClient = new HttpCucmClient({
+      targetUrl: mockServer.getBaseUrl(),
+      authToken: "bad-token-xyz",
+      timeoutMs: 2000,
+    });
+
+    // Default call fails
+    await expect(badClient.getSummary()).rejects.toThrow(AuthenticationError);
+
+    // Call with midflight auth_token override succeeds
+    const summary = (await badClient.executeGenericOperation("GET", "/api/v2/summary", {
+      auth_token: "valid-token-123",
+    })) as any;
+    expect(summary.clusterName).toBeDefined();
+
+    // Subsequent default call still fails (client instance was not permanently modified)
+    await expect(badClient.getSummary()).rejects.toThrow(AuthenticationError);
+  });
+
+  it("supports in-flight target_url and cucm_host overrides", async () => {
+    // Client initialized with an invalid/unreachable target
+    const dummyClient = new HttpCucmClient({
+      targetUrl: "http://127.0.0.1:59999",
+      authToken: "valid-token-123",
+      timeoutMs: 1000,
+      maxRetries: 1,
+    });
+
+    // Midflight target_url override routes to live mockServer
+    const resTarget = (await dummyClient.executeGenericOperation("GET", "/api/v2/summary", {
+      target_url: mockServer.getBaseUrl(),
+    })) as any;
+    expect(resTarget.clusterName).toBeDefined();
+
+    // Midflight cucm_host and cucm_port override
+    const serverUrl = new URL(mockServer.getBaseUrl());
+    const resHost = (await dummyClient.executeGenericOperation("GET", "/api/v2/summary", {
+      cucm_host: `http://${serverUrl.hostname}`,
+      cucm_port: Number(serverUrl.port),
+    })) as any;
+    expect(resHost.clusterName).toBeDefined();
+  });
+
+  it("supports version parameter in setNodeStatus", async () => {
+    const res = (await client.setNodeStatus("CUCM-PUB", "publisher", "Ok", "15.0")) as any;
+    expect(res).toBeDefined();
+    expect(res.version).toBe("15.0");
+  });
 });

@@ -27,7 +27,8 @@ export const emuSeedFixturesTool: McpTool = {
       },
       version: {
         type: "string",
-        description: "Target CUCM release version string (e.g. 14.0, 15.0)",
+        enum: ["11.0", "11.5", "12.0", "12.5", "14.0", "15.0"],
+        description: "Target CUCM release version string (e.g. 11.0, 11.5, 12.0, 12.5, 14.0, 15.0)",
       },
       clusterIp: {
         type: "string",

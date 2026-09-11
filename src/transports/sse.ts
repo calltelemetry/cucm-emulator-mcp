@@ -45,7 +45,7 @@ export class SseServerManager {
       res.status(200).json({
         status: "ok",
         service: "@calltelemetry/cucm-emulator-mcp",
-        version: "0.2.0",
+        version: "0.2.1",
         transport: "sse",
         uptime: process.uptime(),
         toolsCount: this.options.registry.size,

@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name("cucm-emulator-mcp")
   .description("OpenAPI-driven Model Context Protocol (MCP) server for Cisco CUCM Emulator")
-  .version("0.2.0", "-v, --version", "Output the current version")
+  .version("0.2.1", "-v, --version", "Output the current version")
   .option("-t, --transport <type>", "Transport type (stdio or sse)", process.env.MCP_TRANSPORT || "stdio")
   .option("-p, --port <number>", "HTTP port for SSE transport", process.env.PORT || process.env.MCP_PORT || "3000")
   .option("--bind-host <host>", "Host interface to bind SSE transport", process.env.HOST || process.env.MCP_HOST || "127.0.0.1")

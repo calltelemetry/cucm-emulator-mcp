@@ -290,12 +290,24 @@ export class InMemoryCucmStore {
   }
 
   /**
-   * ADR 0120/0122 Failover Testing: Updates node status.
+   * Updates the cluster-wide CUCM version midflight.
+   */
+  public setVersion(version: SupportedAxlVersion): void {
+    this.version = version;
+    for (const node of this.nodes.values()) {
+      node.version = version;
+    }
+    this.recordAuditLog("VersionUpdated", "Cluster", `Cluster version set to ${version}`);
+  }
+
+  /**
+   * ADR 0120/0122 Failover Testing: Updates node status and version.
    */
   public setNodeStatus(
     nodeName: string,
     role?: CucmNodeRole,
-    risReturnCode: CucmRisNodeReturnCode = "Ok"
+    risReturnCode: CucmRisNodeReturnCode = "Ok",
+    version?: SupportedAxlVersion
   ): CucmNode {
     const node = this.nodes.get(nodeName);
     if (!node) {
@@ -303,6 +315,12 @@ export class InMemoryCucmStore {
     }
 
     if (role) node.role = role;
+    if (version) {
+      node.version = version;
+      if (node.role === "publisher") {
+        this.version = version;
+      }
+    }
     node.risReturnCode = risReturnCode;
     this.nodes.set(nodeName, node);
 

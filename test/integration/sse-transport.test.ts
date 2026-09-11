@@ -38,7 +38,7 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     const json = (await res.json()) as any;
     expect(json.status).toBe("ok");
     expect(json.service).toBe("@calltelemetry/cucm-emulator-mcp");
-    expect(json.version).toBe("0.2.0");
+    expect(json.version).toBe("0.2.1");
     expect(json.transport).toBe("sse");
     expect(json.toolsCount).toBeGreaterThanOrEqual(15);
     expect(json.mode).toBe("mock");
@@ -48,7 +48,7 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     expect(resZ.ok).toBe(true);
     const jsonZ = (await resZ.json()) as any;
     expect(jsonZ.status).toBe("ok");
-    expect(jsonZ.version).toBe("0.2.0");
+    expect(jsonZ.version).toBe("0.2.1");
   });
 
   it("serves tool metadata at GET /tools", async () => {

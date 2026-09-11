@@ -3,6 +3,7 @@
  */
 
 export type SupportedAxlVersion =
+  | "11.0"
   | "11.5"
   | "12.0"
   | "12.5"
