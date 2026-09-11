@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_seed_fixtures: Seeds deterministic fixture data into the emulator.
+ * cucm_emulator_seed_fixtures: Seeds deterministic fixture data into the emulator.
  */
-export const emuSeedFixturesTool: McpTool = {
-  name: "emu_seed_fixtures",
+export const cucmEmulatorSeedFixturesTool: McpTool = {
+  name: "cucm_emulator_seed_fixtures",
   description: "Seeds deterministic cluster topology, nodes, phones, dial plan partitions, CSS, and CURRI policies into the CUCM emulator store.",
   inputSchema: {
     type: "object",
@@ -37,7 +37,7 @@ export const emuSeedFixturesTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_seed_fixtures", "POST", ["fixtures"]),
+  annotations: inferToolAnnotations("cucm_emulator_seed_fixtures", "POST", ["fixtures"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const result = await client.seedFixtures(args as any);
@@ -54,10 +54,10 @@ export const emuSeedFixturesTool: McpTool = {
 };
 
 /**
- * emu_reset_store: Resets or wipes emulator state.
+ * cucm_emulator_reset_store: Resets or wipes emulator state.
  */
-export const emuResetStoreTool: McpTool = {
-  name: "emu_reset_store",
+export const cucmEmulatorResetStoreTool: McpTool = {
+  name: "cucm_emulator_reset_store",
   description: "Resets or wipes the CUCM emulator in-memory state and re-seeds with a specified topology profile.",
   inputSchema: {
     type: "object",
@@ -75,7 +75,7 @@ export const emuResetStoreTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_reset_store", "POST", ["fixtures"]),
+  annotations: inferToolAnnotations("cucm_emulator_reset_store", "POST", ["fixtures"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const mode = typeof args.mode === "string" ? args.mode : "soft";
@@ -94,17 +94,17 @@ export const emuResetStoreTool: McpTool = {
 };
 
 /**
- * emu_inspect_fixtures: Retrieves summary and topology overview of the current store state.
+ * cucm_emulator_inspect_fixtures: Retrieves summary and topology overview of the current store state.
  */
-export const emuInspectFixturesTool: McpTool = {
-  name: "emu_inspect_fixtures",
+export const cucmEmulatorInspectFixturesTool: McpTool = {
+  name: "cucm_emulator_inspect_fixtures",
   description: "Inspects and returns a comprehensive summary of active CUCM cluster nodes, phones, call sessions, policies, and buffers.",
   inputSchema: {
     type: "object",
     properties: {},
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_inspect_fixtures", "GET", ["fixtures"]),
+  annotations: inferToolAnnotations("cucm_emulator_inspect_fixtures", "GET", ["fixtures"]),
   async execute(_args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const summary = await client.getSummary();
@@ -120,8 +120,13 @@ export const emuInspectFixturesTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuSeedFixturesTool = cucmEmulatorSeedFixturesTool;
+export const emuResetStoreTool = cucmEmulatorResetStoreTool;
+export const emuInspectFixturesTool = cucmEmulatorInspectFixturesTool;
+
 export const fixturesDomainTools: McpTool[] = [
-  emuSeedFixturesTool,
-  emuResetStoreTool,
-  emuInspectFixturesTool,
+  cucmEmulatorSeedFixturesTool,
+  cucmEmulatorResetStoreTool,
+  cucmEmulatorInspectFixturesTool,
 ];

@@ -22,7 +22,7 @@ describe("Dynamic Tool Generator", () => {
 
     for (const tool of tools) {
       expect(tool.name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/);
-      expect(tool.name).toMatch(/^emu_/);
+      expect(tool.name).toMatch(/^cucm_emulator_/);
       expect(tool.description).toBeDefined();
       expect(tool.inputSchema).toBeDefined();
       expect(tool.inputSchema.type).toBe("object");
@@ -39,28 +39,28 @@ describe("Dynamic Tool Generator", () => {
     expect(isAgentFacingPath("/logcollectionservice/services/DimeGetFileService")).toBe(true);
     const tools = generateDynamicToolsFromSpec(spec);
     const names = tools.map((tool) => tool.name);
-    expect(names).toContain("emu_axl");
-    expect(names).toContain("emu_ris");
-    expect(names).toContain("emu_dime");
-    expect(names).toContain("emu_dime_file");
+    expect(names).toContain("cucm_emulator_axl");
+    expect(names).toContain("cucm_emulator_ris");
+    expect(names).toContain("cucm_emulator_dime");
+    expect(names).toContain("cucm_emulator_dime_file");
     expect(tools.some((tool) => tool.name.includes("log_collection"))).toBe(false);
-    expect(tools.some((tool) => tool.name === "emu_post_axl_")).toBe(false);
-    for (const name of ["emu_axl", "emu_ris", "emu_dime", "emu_dime_file"]) {
+    expect(tools.some((tool) => tool.name === "cucm_emulator_post_axl_")).toBe(false);
+    for (const name of ["cucm_emulator_axl", "cucm_emulator_ris", "cucm_emulator_dime", "cucm_emulator_dime_file"]) {
       expect(name.length).toBeLessThanOrEqual(64);
     }
-    const dime = tools.find((tool) => tool.name === "emu_dime");
+    const dime = tools.find((tool) => tool.name === "cucm_emulator_dime");
     expect(dime?.inputSchema.properties).toHaveProperty("body");
   });
 
   it("creates keyed map of dynamic tools", () => {
     const toolMap = generateDynamicToolsMap(spec);
-    expect(toolMap.has("emu_get_summary")).toBe(true);
-    expect(toolMap.has("emu_get_topology")).toBe(true);
+    expect(toolMap.has("cucm_emulator_get_summary")).toBe(true);
+    expect(toolMap.has("cucm_emulator_get_topology")).toBe(true);
   });
 
   it("executes dynamic tool via client generic dispatcher", async () => {
     const toolMap = generateDynamicToolsMap(spec);
-    const summaryTool = toolMap.get("emu_get_summary");
+    const summaryTool = toolMap.get("cucm_emulator_get_summary");
     expect(summaryTool).toBeDefined();
 
     const result = await summaryTool!.execute({}, client);

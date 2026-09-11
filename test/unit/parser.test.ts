@@ -20,20 +20,20 @@ describe("OpenAPI Spec Loader & Parser (parser.ts)", () => {
     expect(operations.size).toBeGreaterThan(40);
 
     // Verify key operations exist
-    expect(operations.has("emu_get_summary")).toBe(true);
-    expect(operations.has("emu_get_topology")).toBe(true);
-    expect(operations.has("emu_list_inventory")).toBe(true);
-    expect(operations.has("emu_upsert_inventory")).toBe(true);
-    expect(operations.has("emu_create_call_session")).toBe(true);
-    expect(operations.has("emu_list_cdr_records")).toBe(true);
-    expect(operations.has("emu_export_cdr_csv")).toBe(true);
-    expect(operations.has("emu_load_snapshot")).toBe(true);
+    expect(operations.has("cucm_emulator_get_summary")).toBe(true);
+    expect(operations.has("cucm_emulator_get_topology")).toBe(true);
+    expect(operations.has("cucm_emulator_list_inventory")).toBe(true);
+    expect(operations.has("cucm_emulator_upsert_inventory")).toBe(true);
+    expect(operations.has("cucm_emulator_create_call_session")).toBe(true);
+    expect(operations.has("cucm_emulator_list_cdr_records")).toBe(true);
+    expect(operations.has("cucm_emulator_export_cdr_csv")).toBe(true);
+    expect(operations.has("cucm_emulator_load_snapshot")).toBe(true);
 
-    const summaryOp = operations.get("emu_get_summary")!;
+    const summaryOp = operations.get("cucm_emulator_get_summary")!;
     expect(summaryOp.httpMethod).toBe("GET");
     expect(summaryOp.pathTemplate).toBe("/api/v2/summary");
 
-    const callOp = operations.get("emu_create_call_session")!;
+    const callOp = operations.get("cucm_emulator_create_call_session")!;
     expect(callOp.httpMethod).toBe("POST");
     expect(callOp.hasBody).toBe(true);
   });
