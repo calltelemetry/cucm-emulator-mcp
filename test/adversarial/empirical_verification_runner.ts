@@ -82,21 +82,21 @@ async function main() {
 
     // 15 Discrete Domain Tools required
     const expectedDomainTools = [
-      "emu_seed_fixtures",
-      "emu_reset_store",
-      "emu_inspect_fixtures",
-      "emu_list_nodes",
-      "emu_set_node_status",
-      "emu_list_phones",
-      "emu_set_phone_status",
-      "emu_get_phone_web",
-      "emu_simulate_call",
-      "emu_call_action",
-      "emu_list_active_calls",
-      "emu_evaluate_curri",
-      "emu_get_curri_history",
-      "emu_generate_cdrs",
-      "emu_get_cdr_history",
+      "cucm_emulator_seed_fixtures",
+      "cucm_emulator_reset_store",
+      "cucm_emulator_inspect_fixtures",
+      "cucm_emulator_list_nodes",
+      "cucm_emulator_simulate_node_failover",
+      "cucm_emulator_list_phones",
+      "cucm_emulator_set_phone_status",
+      "cucm_emulator_get_phone_web",
+      "cucm_emulator_simulate_call",
+      "cucm_emulator_call_action",
+      "cucm_emulator_list_active_calls",
+      "cucm_emulator_evaluate_curri",
+      "cucm_emulator_get_curri_history",
+      "cucm_emulator_generate_cdrs",
+      "cucm_emulator_get_cdr_history",
     ];
 
     for (const dt of expectedDomainTools) {
@@ -112,8 +112,8 @@ async function main() {
 
     // Verify discrete naming and discrete single-purpose schemas
     for (const tool of tools) {
-      if (!tool.name.startsWith("emu_")) {
-        throw new Error(`Tool "${tool.name}" violates naming convention (must start with emu_)`);
+      if (!tool.name.startsWith("cucm_emulator_")) {
+        throw new Error(`Tool "${tool.name}" violates naming convention (must start with cucm_emulator_)`);
       }
       if (typeof tool.description !== "string" || tool.description.length === 0) {
         throw new Error(`Tool "${tool.name}" missing description`);
@@ -135,22 +135,22 @@ async function main() {
     const client = new Client({ name: "schema-validator-test", version: "1.0.0" }, { capabilities: {} });
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
-    // Test A: Missing required parameter on emu_set_phone_status
+    // Test A: Missing required parameter on cucm_emulator_set_phone_status
     const resMissing = await client.callTool({
-      name: "emu_set_phone_status",
+      name: "cucm_emulator_set_phone_status",
       arguments: {},
     });
     if (!resMissing.isError) {
-      throw new Error("Expected emu_set_phone_status without arguments to return isError: true");
+      throw new Error("Expected cucm_emulator_set_phone_status without arguments to return isError: true");
     }
 
-    // Test B: Invalid node on emu_set_node_status
+    // Test B: Invalid node on cucm_emulator_simulate_node_failover
     const resBadNode = await client.callTool({
-      name: "emu_set_node_status",
+      name: "cucm_emulator_simulate_node_failover",
       arguments: { nodeName: "GHOST_NODE_999", status: "NotFound" },
     });
     if (!resBadNode.isError) {
-      throw new Error("Expected emu_set_node_status with ghost node to return isError: true");
+      throw new Error("Expected cucm_emulator_simulate_node_failover with ghost node to return isError: true");
     }
     const badNodeText = (resBadNode.content as any)[0].text;
     if (!badNodeText.includes("CucmNode") && !badNodeText.includes("not found")) {
@@ -249,15 +249,15 @@ async function main() {
     // 3. List tools
     sendRpc({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
 
-    // 4. Call emu_list_nodes
-    sendRpc({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "emu_list_nodes", arguments: {} } });
+    // 4. Call cucm_emulator_list_nodes
+    sendRpc({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "cucm_emulator_list_nodes", arguments: {} } });
 
-    // 5. Call emu_simulate_call
+    // 5. Call cucm_emulator_simulate_call
     sendRpc({
       jsonrpc: "2.0",
       id: 4,
       method: "tools/call",
-      params: { name: "emu_simulate_call", arguments: { callingNumber: "1001", calledNumber: "1002", duration: 20 } },
+      params: { name: "cucm_emulator_simulate_call", arguments: { callingNumber: "1001", calledNumber: "1002", duration: 20 } },
     });
 
     // Wait for all 4 responses

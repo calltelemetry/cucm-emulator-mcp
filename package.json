@@ -1,6 +1,6 @@
 {
   "name": "@calltelemetry/cucm-emulator-mcp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "OpenAPI-driven Model Context Protocol (MCP) server for Cisco CUCM Emulator with dynamic tool generation and in-memory mock store.",
   "type": "module",
   "main": "./dist/src/index.js",

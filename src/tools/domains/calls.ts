@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_simulate_call: Simulates a call between endpoints or external PSTN with RTP metrics and CDR generation.
+ * cucm_emulator_simulate_call: Simulates a call between endpoints or external PSTN with RTP metrics and CDR generation.
  */
-export const emuSimulateCallTool: McpTool = {
-  name: "emu_simulate_call",
+export const cucmEmulatorSimulateCallTool: McpTool = {
+  name: "cucm_emulator_simulate_call",
   description: "Simulates an end-to-end telephone call through CUCM dial plan routing, calculating RTP media metrics and emitting synthetic CDR/CMR records.",
   inputSchema: {
     type: "object",
@@ -43,7 +43,7 @@ export const emuSimulateCallTool: McpTool = {
     required: ["callingNumber", "calledNumber"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_simulate_call", "POST", ["calls"]),
+  annotations: inferToolAnnotations("cucm_emulator_simulate_call", "POST", ["calls"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const result = await client.simulateCall(args as any);
@@ -60,10 +60,10 @@ export const emuSimulateCallTool: McpTool = {
 };
 
 /**
- * emu_call_action: Executes mid-call control actions (answer, hold, resume, drop).
+ * cucm_emulator_call_action: Executes mid-call control actions (answer, hold, resume, drop).
  */
-export const emuCallActionTool: McpTool = {
-  name: "emu_call_action",
+export const cucmEmulatorCallActionTool: McpTool = {
+  name: "cucm_emulator_call_action",
   description: "Executes mid-call state transitions such as answering, holding, resuming, or disconnecting an active call session.",
   inputSchema: {
     type: "object",
@@ -85,7 +85,7 @@ export const emuCallActionTool: McpTool = {
     required: ["sessionId", "action"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_call_action", "POST", ["calls"]),
+  annotations: inferToolAnnotations("cucm_emulator_call_action", "POST", ["calls"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const sessionId = String(args.sessionId);
@@ -105,10 +105,10 @@ export const emuCallActionTool: McpTool = {
 };
 
 /**
- * emu_list_active_calls: Lists currently active call sessions in the emulator.
+ * cucm_emulator_list_active_calls: Lists currently active call sessions in the emulator.
  */
-export const emuListActiveCallsTool: McpTool = {
-  name: "emu_list_active_calls",
+export const cucmEmulatorListActiveCallsTool: McpTool = {
+  name: "cucm_emulator_list_active_calls",
   description: "Lists active or in-progress telephone call sessions and their current state (alerting, connected, policy-pending, held).",
   inputSchema: {
     type: "object",
@@ -125,7 +125,7 @@ export const emuListActiveCallsTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_list_active_calls", "GET", ["calls"]),
+  annotations: inferToolAnnotations("cucm_emulator_list_active_calls", "GET", ["calls"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const calls = await client.listActiveCalls(args as any);
@@ -141,8 +141,13 @@ export const emuListActiveCallsTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuSimulateCallTool = cucmEmulatorSimulateCallTool;
+export const emuCallActionTool = cucmEmulatorCallActionTool;
+export const emuListActiveCallsTool = cucmEmulatorListActiveCallsTool;
+
 export const callsDomainTools: McpTool[] = [
-  emuSimulateCallTool,
-  emuCallActionTool,
-  emuListActiveCallsTool,
+  cucmEmulatorSimulateCallTool,
+  cucmEmulatorCallActionTool,
+  cucmEmulatorListActiveCallsTool,
 ];

@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_evaluate_curri: Evaluates external CURRI / ECC routing policies.
+ * cucm_emulator_evaluate_curri: Evaluates external CURRI / ECC routing policies.
  */
-export const emuEvaluateCurriTool: McpTool = {
-  name: "emu_evaluate_curri",
+export const cucmEmulatorEvaluateCurriTool: McpTool = {
+  name: "cucm_emulator_evaluate_curri",
   description: "Evaluates external call routing policies via Cisco External Call Control (CURRI / ECC), returning permit, deny, or divert routing decisions.",
   inputSchema: {
     type: "object",
@@ -31,7 +31,7 @@ export const emuEvaluateCurriTool: McpTool = {
     required: ["callingNumber", "calledNumber"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_evaluate_curri", "POST", ["curri"]),
+  annotations: inferToolAnnotations("cucm_emulator_evaluate_curri", "POST", ["curri"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const result = await client.evaluateCurri(args as any);
@@ -48,10 +48,10 @@ export const emuEvaluateCurriTool: McpTool = {
 };
 
 /**
- * emu_get_curri_history: Retrieves historical CURRI policy evaluation records.
+ * cucm_emulator_get_curri_history: Retrieves historical CURRI policy evaluation records.
  */
-export const emuGetCurriHistoryTool: McpTool = {
-  name: "emu_get_curri_history",
+export const cucmEmulatorGetCurriHistoryTool: McpTool = {
+  name: "cucm_emulator_get_curri_history",
   description: "Retrieves the log of past CURRI / ECC routing evaluation decisions and rule matches.",
   inputSchema: {
     type: "object",
@@ -67,7 +67,7 @@ export const emuGetCurriHistoryTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_get_curri_history", "GET", ["curri"]),
+  annotations: inferToolAnnotations("cucm_emulator_get_curri_history", "GET", ["curri"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const history = await client.getCurriHistory(args as any);
@@ -83,7 +83,11 @@ export const emuGetCurriHistoryTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuEvaluateCurriTool = cucmEmulatorEvaluateCurriTool;
+export const emuGetCurriHistoryTool = cucmEmulatorGetCurriHistoryTool;
+
 export const curriDomainTools: McpTool[] = [
-  emuEvaluateCurriTool,
-  emuGetCurriHistoryTool,
+  cucmEmulatorEvaluateCurriTool,
+  cucmEmulatorGetCurriHistoryTool,
 ];

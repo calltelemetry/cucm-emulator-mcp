@@ -16,13 +16,13 @@ describe("ToolRegistry", () => {
 
   it("initializes with 16 domain tools", () => {
     expect(registry.size).toBe(16);
-    expect(registry.hasTool("emu_seed_fixtures")).toBe(true);
-    expect(registry.hasTool("emu_simulate_call")).toBe(true);
+    expect(registry.hasTool("cucm_emulator_seed_fixtures")).toBe(true);
+    expect(registry.hasTool("cucm_emulator_simulate_call")).toBe(true);
   });
 
   it("registers and unregisters custom tools", () => {
     const customTool: McpTool = {
-      name: "emu_custom_test_tool",
+      name: "cucm_emulator_custom_test_tool",
       description: "Custom test tool",
       inputSchema: { type: "object" },
       async execute() {
@@ -31,21 +31,21 @@ describe("ToolRegistry", () => {
     };
 
     registry.register(customTool);
-    expect(registry.hasTool("emu_custom_test_tool")).toBe(true);
+    expect(registry.hasTool("cucm_emulator_custom_test_tool")).toBe(true);
 
-    const removed = registry.unregister("emu_custom_test_tool");
+    const removed = registry.unregister("cucm_emulator_custom_test_tool");
     expect(removed).toBe(true);
-    expect(registry.hasTool("emu_custom_test_tool")).toBe(false);
+    expect(registry.hasTool("cucm_emulator_custom_test_tool")).toBe(false);
   });
 
   it("executes registered tool and formats result", async () => {
-    const result = await registry.executeTool("emu_inspect_fixtures", {}, client);
+    const result = await registry.executeTool("cucm_emulator_inspect_fixtures", {}, client);
     expect(result.isError).toBeFalsy();
     expect(result.content[0].type).toBe("text");
   });
 
   it("returns error for non-existent tool execution", async () => {
-    const result = await registry.executeTool("emu_nonexistent_tool_xyz", {}, client);
+    const result = await registry.executeTool("cucm_emulator_nonexistent_tool_xyz", {}, client);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("not found in MCP registry");
   });

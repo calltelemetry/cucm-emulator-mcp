@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_list_nodes: Lists all CUCM cluster nodes with role, IP addresses, and RIS health status.
+ * cucm_emulator_list_nodes: Lists all CUCM cluster nodes with role, IP addresses, and RIS health status.
  */
-export const emuListNodesTool: McpTool = {
-  name: "emu_list_nodes",
+export const cucmEmulatorListNodesTool: McpTool = {
+  name: "cucm_emulator_list_nodes",
   description: "Lists all CUCM cluster nodes (Publisher, Subscribers, TFTP) with their IP addresses, active versions, and RISDB return codes.",
   inputSchema: {
     type: "object",
@@ -27,7 +27,7 @@ export const emuListNodesTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_list_nodes", "GET", ["nodes"]),
+  annotations: inferToolAnnotations("cucm_emulator_list_nodes", "GET", ["nodes"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const nodes = await client.listInventory("nodes", args);
@@ -44,11 +44,11 @@ export const emuListNodesTool: McpTool = {
 };
 
 /**
- * emu_set_node_status: Simulates node failover (ADR 0120/0122) by modifying node RIS return code / status.
+ * cucm_emulator_simulate_node_failover: Simulates node failover (ADR 0120/0122) by modifying node RIS return code / status.
  */
-export const emuSetNodeStatusTool: McpTool = {
-  name: "emu_set_node_status",
-  description: "Modifies the status and RIS return code of a cluster node to simulate failover, network isolation, or service degradation (ADR 0120/0122).",
+export const cucmEmulatorSimulateNodeFailoverTool: McpTool = {
+  name: "cucm_emulator_simulate_node_failover",
+  description: "Modifies the status, version, and RIS return code of a cluster node to simulate failover, network isolation, service degradation, or cluster version transitions (ADR 0120/0122).",
   inputSchema: {
     type: "object",
     properties: {
@@ -80,7 +80,7 @@ export const emuSetNodeStatusTool: McpTool = {
     required: ["nodeName"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_set_node_status", "POST", ["nodes"]),
+  annotations: inferToolAnnotations("cucm_emulator_simulate_node_failover", "POST", ["nodes"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const nodeName = String(args.nodeName);
@@ -100,7 +100,11 @@ export const emuSetNodeStatusTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuListNodesTool = cucmEmulatorListNodesTool;
+export const emuSetNodeStatusTool = cucmEmulatorSimulateNodeFailoverTool;
+
 export const nodesDomainTools: McpTool[] = [
-  emuListNodesTool,
-  emuSetNodeStatusTool,
+  cucmEmulatorListNodesTool,
+  cucmEmulatorSimulateNodeFailoverTool,
 ];

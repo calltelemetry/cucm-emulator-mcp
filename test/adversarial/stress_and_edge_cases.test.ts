@@ -398,7 +398,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
 
     it("4.2 Tool Call with Illegal Arguments returns handled error result with isError=true", async () => {
       const result = await mcpClient.callTool({
-        name: "emu_set_node_status",
+        name: "cucm_emulator_simulate_node_failover",
         arguments: {
           nodeName: "non-existent-node-12345",
           status: "NotFound",
@@ -412,7 +412,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
     it("4.3 Concurrent MCP Tool Calls: dispatches 50 simultaneous tool calls over MCP client", async () => {
       const promises = Array.from({ length: 50 }, (_, i) => {
         return mcpClient.callTool({
-          name: "emu_simulate_call",
+          name: "cucm_emulator_simulate_call",
           arguments: {
             callingNumber: `10${(i % 50).toString().padStart(2, "0")}`,
             calledNumber: `20${(i % 50).toString().padStart(2, "0")}`,
@@ -511,7 +511,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
         id: 3,
         method: "tools/call",
         params: {
-          name: "emu_list_nodes",
+          name: "cucm_emulator_list_nodes",
           arguments: {},
         },
       });
@@ -521,7 +521,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
         id: 4,
         method: "tools/call",
         params: {
-          name: "emu_simulate_call",
+          name: "cucm_emulator_simulate_call",
           arguments: {
             callingNumber: "1001",
             calledNumber: "1002",
@@ -535,7 +535,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
         id: 5,
         method: "tools/call",
         params: {
-          name: "emu_evaluate_curri",
+          name: "cucm_emulator_evaluate_curri",
           arguments: {
             callingNumber: "1001",
             calledNumber: "1002",
@@ -548,7 +548,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
         id: 6,
         method: "tools/call",
         params: {
-          name: "emu_generate_cdrs",
+          name: "cucm_emulator_generate_cdrs",
           arguments: {
             count: 3,
           },
@@ -639,7 +639,7 @@ describe("Adversarial & Empirical Stress Testing", () => {
           id: i,
           method: "tools/call",
           params: {
-            name: "emu_simulate_call",
+            name: "cucm_emulator_simulate_call",
             arguments: {
               callingNumber: `10${(i % 50).toString().padStart(2, "0")}`,
               calledNumber: `20${(i % 50).toString().padStart(2, "0")}`,

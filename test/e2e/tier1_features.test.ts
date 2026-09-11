@@ -2,15 +2,15 @@
  * Tier 1: Feature Coverage in Isolation
  *
  * 100% Tool Surface Coverage:
- * - Domain 1: Fixtures & Topology (emu_seed_fixtures, emu_reset_store, emu_inspect_fixtures)
- * - Domain 2: Nodes & Cluster Health (emu_list_nodes, emu_set_node_status)
- * - Domain 3: Phones & Registration (emu_list_phones, emu_set_phone_status, emu_get_phone_web)
- * - Domain 4: Call Simulation & Legs (emu_simulate_call, emu_call_action, emu_list_active_calls)
- * - Domain 5: CURRI / ECC Policy Routing (emu_evaluate_curri, emu_get_curri_history)
- * - Domain 6: CDR / CMR Buffers (emu_generate_cdrs, emu_get_cdr_history)
- * - Dynamic OpenAPI Operations: emu_get_summary, emu_query_sql, emu_get_topology, emu_list_inventory,
- *   emu_upsert_inventory, emu_get_inventory_item, emu_patch_inventory_item, emu_delete_inventory_item,
- *   emu_create_call_session, emu_list_cdr_records, emu_export_cdr_csv, emu_load_snapshot, etc.
+ * - Domain 1: Fixtures & Topology (cucm_emulator_seed_fixtures, cucm_emulator_reset_store, cucm_emulator_inspect_fixtures)
+ * - Domain 2: Nodes & Cluster Health (cucm_emulator_list_nodes, cucm_emulator_simulate_node_failover)
+ * - Domain 3: Phones & Registration (cucm_emulator_list_phones, cucm_emulator_set_phone_status, cucm_emulator_get_phone_web)
+ * - Domain 4: Call Simulation & Legs (cucm_emulator_simulate_call, cucm_emulator_call_action, cucm_emulator_list_active_calls)
+ * - Domain 5: CURRI / ECC Policy Routing (cucm_emulator_evaluate_curri, cucm_emulator_get_curri_history)
+ * - Domain 6: CDR / CMR Buffers (cucm_emulator_generate_cdrs, cucm_emulator_get_cdr_history)
+ * - Dynamic OpenAPI Operations: cucm_emulator_get_summary, cucm_emulator_query_sql, cucm_emulator_get_topology, cucm_emulator_list_inventory,
+ *   cucm_emulator_upsert_inventory, cucm_emulator_get_inventory_item, cucm_emulator_patch_inventory_item, cucm_emulator_delete_inventory_item,
+ *   cucm_emulator_create_call_session, cucm_emulator_list_cdr_records, cucm_emulator_export_cdr_csv, cucm_emulator_load_snapshot, etc.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -113,7 +113,7 @@ describe("Tier 1: Feature Coverage in Isolation", () => {
       expect(pub.ipv4Address).toBeDefined();
     });
 
-    it("2.2 emu_set_node_status: updates subscriber node to Offline for ADR 0120/0122 failover", async () => {
+    it("2.2 cucm_emulator_simulate_node_failover: updates subscriber node to Offline for ADR 0120/0122 failover", async () => {
       const nodes = (await directClient.listInventory("nodes")) as any[];
       const sub = nodes.find((n: any) => n.role === "subscriber");
       expect(sub).toBeDefined();
@@ -126,7 +126,7 @@ describe("Tier 1: Feature Coverage in Isolation", () => {
       expect(updatedSub.risReturnCode).toBe("NotFound");
     });
 
-    it("2.3 emu_set_node_status: restores subscriber node to Online", async () => {
+    it("2.3 cucm_emulator_simulate_node_failover: restores subscriber node to Online", async () => {
       const nodes = (await directClient.listInventory("nodes")) as any[];
       const sub = nodes.find((n: any) => n.role === "subscriber");
 

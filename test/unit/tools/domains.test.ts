@@ -34,7 +34,8 @@ describe("Discrete Domain Tools (16 Tools)", () => {
     expect(allDomainTools).toHaveLength(16);
     const names = allDomainTools.map((t) => t.name);
     expect(new Set(names).size).toBe(16);
-    expect(names).toContain("emu_get_phone_screenshot");
+    expect(names).toContain("cucm_emulator_get_phone_screenshot");
+    expect(names).toContain("cucm_emulator_simulate_node_failover");
   });
 
   // 1. Fixtures Tools

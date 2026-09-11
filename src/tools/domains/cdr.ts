@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_generate_cdrs: Generates batches of synthetic CDR records based on realistic calling patterns.
+ * cucm_emulator_generate_cdrs: Generates batches of synthetic CDR records based on realistic calling patterns.
  */
-export const emuGenerateCdrsTool: McpTool = {
-  name: "emu_generate_cdrs",
+export const cucmEmulatorGenerateCdrsTool: McpTool = {
+  name: "cucm_emulator_generate_cdrs",
   description: "Generates realistic synthetic Cisco Call Detail Records (CDRs) for load testing, abandoned call analysis, or CURRI block reporting.",
   inputSchema: {
     type: "object",
@@ -34,7 +34,7 @@ export const emuGenerateCdrsTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_generate_cdrs", "POST", ["cdr"]),
+  annotations: inferToolAnnotations("cucm_emulator_generate_cdrs", "POST", ["cdr"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const result = await client.generateCdrs(args as any);
@@ -51,10 +51,10 @@ export const emuGenerateCdrsTool: McpTool = {
 };
 
 /**
- * emu_get_cdr_history: Retrieves generated or exported CDR records in JSON or CSV format.
+ * cucm_emulator_get_cdr_history: Retrieves generated or exported CDR records in JSON or CSV format.
  */
-export const emuGetCdrHistoryTool: McpTool = {
-  name: "emu_get_cdr_history",
+export const cucmEmulatorGetCdrHistoryTool: McpTool = {
+  name: "cucm_emulator_get_cdr_history",
   description: "Retrieves recent CDR records from the emulator buffer in structured JSON or raw Cisco CSV export format.",
   inputSchema: {
     type: "object",
@@ -75,7 +75,7 @@ export const emuGetCdrHistoryTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_get_cdr_history", "GET", ["cdr"]),
+  annotations: inferToolAnnotations("cucm_emulator_get_cdr_history", "GET", ["cdr"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const history = await client.getCdrHistory(args as any);
@@ -91,7 +91,11 @@ export const emuGetCdrHistoryTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuGenerateCdrsTool = cucmEmulatorGenerateCdrsTool;
+export const emuGetCdrHistoryTool = cucmEmulatorGetCdrHistoryTool;
+
 export const cdrDomainTools: McpTool[] = [
-  emuGenerateCdrsTool,
-  emuGetCdrHistoryTool,
+  cucmEmulatorGenerateCdrsTool,
+  cucmEmulatorGetCdrHistoryTool,
 ];

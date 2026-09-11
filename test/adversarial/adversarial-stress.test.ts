@@ -62,25 +62,25 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
     });
 
     it("1.1 handles empty store reset ('empty' profile) and 0 inventory counts", async () => {
-      const resetRes = (await mcpClient.callToolSuccess("emu_reset_store", {
+      const resetRes = (await mcpClient.callToolSuccess("cucm_emulator_reset_store", {
         mode: "soft",
         profile: "empty",
       })) as any;
       expect(resetRes.status).toBe("success");
 
-      const phones = (await mcpClient.callToolSuccess("emu_list_phones", {})) as any[];
+      const phones = (await mcpClient.callToolSuccess("cucm_emulator_list_phones", {})) as any[];
       expect(phones).toHaveLength(0);
 
-      const nodes = (await mcpClient.callToolSuccess("emu_list_nodes", {})) as any[];
+      const nodes = (await mcpClient.callToolSuccess("cucm_emulator_list_nodes", {})) as any[];
       expect(nodes).toHaveLength(0);
 
-      const calls = (await mcpClient.callToolSuccess("emu_list_active_calls", {})) as any[];
+      const calls = (await mcpClient.callToolSuccess("cucm_emulator_list_active_calls", {})) as any[];
       expect(calls).toHaveLength(0);
     });
 
     it("1.2 handles 0-duration and 0-count synthetic CDR generation", async () => {
       // 0-duration call
-      const call = (await mcpClient.callToolSuccess("emu_simulate_call", {
+      const call = (await mcpClient.callToolSuccess("cucm_emulator_simulate_call", {
         callingNumber: "1001",
         calledNumber: "1002",
         duration: 0,
@@ -90,7 +90,7 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
       expect(call.callSession.mediaLegs[0].packetsSent).toBe(0);
 
       // 0-count CDR generation
-      const cdrGen = (await mcpClient.callToolSuccess("emu_generate_cdrs", {
+      const cdrGen = (await mcpClient.callToolSuccess("cucm_emulator_generate_cdrs", {
         count: 0,
         pattern: "normal",
       })) as any;
@@ -98,7 +98,7 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
       expect(cdrGen.cdrRecords).toHaveLength(0);
 
       // Verify CDR history pagination with limit 1
-      const history = (await mcpClient.callToolSuccess("emu_get_cdr_history", {
+      const history = (await mcpClient.callToolSuccess("cucm_emulator_get_cdr_history", {
         limit: 1,
       })) as any[];
       expect(history.length).toBeLessThanOrEqual(1);
@@ -120,7 +120,7 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
     });
 
     it("1.4 handles extreme call duration (1,000,000 seconds) and 100% packet loss", async () => {
-      const call = (await mcpClient.callToolSuccess("emu_simulate_call", {
+      const call = (await mcpClient.callToolSuccess("cucm_emulator_simulate_call", {
         callingNumber: "2001",
         calledNumber: "2002",
         duration: 1000000,
