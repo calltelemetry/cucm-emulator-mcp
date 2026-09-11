@@ -13,14 +13,14 @@ const program = new Command();
 program
   .name("cucm-emulator-mcp")
   .description("OpenAPI-driven Model Context Protocol (MCP) server for Cisco CUCM Emulator")
-  .version("0.1.3", "-v, --version", "Output the current version")
-  .option("-t, --transport <type>", "Transport type (stdio or sse)", "stdio")
-  .option("-p, --port <number>", "HTTP port for SSE transport", "3000")
-  .option("--bind-host <host>", "Host interface to bind SSE transport", "127.0.0.1")
+  .version("0.2.0", "-v, --version", "Output the current version")
+  .option("-t, --transport <type>", "Transport type (stdio or sse)", process.env.MCP_TRANSPORT || "stdio")
+  .option("-p, --port <number>", "HTTP port for SSE transport", process.env.PORT || process.env.MCP_PORT || "3000")
+  .option("--bind-host <host>", "Host interface to bind SSE transport", process.env.HOST || process.env.MCP_HOST || "127.0.0.1")
   .option("-u, --target-url <url>", "Target live CUCM emulator URL (e.g. http://192.168.124.105:8443)")
   .option("-s, --spec-path <path>", "Path or URL to OpenAPI 3.1.0 specification")
-  .option("-m, --mock", "Force in-memory mock store mode", false)
-  .option("--seed-profile <profile>", "Initial seed fixture profile (lab-small, standard-enterprise, empty)", "lab-small")
+  .option("-m, --mock", "Force in-memory mock store mode", process.env.CUCM_MOCK === "true" || process.env.CUCM_MOCK === "1" || false)
+  .option("--seed-profile <profile>", "Initial seed fixture profile (lab-small, standard-enterprise, empty)", process.env.CUCM_SEED_PROFILE || "lab-small")
   .option("--auth-token <token>", "Bearer authentication token for live CUCM emulator")
   .option("--redact-secrets", "Redact sensitive tokens and credentials from logs", false)
   .action(async (options) => {
@@ -57,7 +57,7 @@ program
 
       if (options.transport === "sse") {
         process.stderr.write(`[INFO] CUCM Emulator MCP Server listening on SSE at ${endpoint}/sse\n`);
-        process.stderr.write(`[INFO] Healthcheck endpoint: ${endpoint}/health\n`);
+        process.stderr.write(`[INFO] Healthcheck endpoint: ${endpoint}/healthz\n`);
       } else {
         process.stderr.write(`[INFO] CUCM Emulator MCP Server running on Stdio transport (JSON-RPC 2.0 on stdin/stdout)\n`);
       }

@@ -30,7 +30,7 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     await server.stop();
   });
 
-  it("serves healthcheck at GET /health", async () => {
+  it("serves healthcheck at GET /health and GET /healthz", async () => {
     const healthUrl = sseUrl.replace(/\/sse$/, "/health");
     const res = await fetch(healthUrl);
     expect(res.ok).toBe(true);
@@ -38,9 +38,17 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     const json = (await res.json()) as any;
     expect(json.status).toBe("ok");
     expect(json.service).toBe("@calltelemetry/cucm-emulator-mcp");
+    expect(json.version).toBe("0.2.0");
     expect(json.transport).toBe("sse");
     expect(json.toolsCount).toBeGreaterThanOrEqual(15);
     expect(json.mode).toBe("mock");
+
+    const healthzUrl = sseUrl.replace(/\/sse$/, "/healthz");
+    const resZ = await fetch(healthzUrl);
+    expect(resZ.ok).toBe(true);
+    const jsonZ = (await resZ.json()) as any;
+    expect(jsonZ.status).toBe("ok");
+    expect(jsonZ.version).toBe("0.2.0");
   });
 
   it("serves tool metadata at GET /tools", async () => {
