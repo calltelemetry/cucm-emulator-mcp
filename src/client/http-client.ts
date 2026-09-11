@@ -21,9 +21,18 @@ import { isSoapEndpoint } from "../openapi/schema-builder.js";
 export interface HttpCucmClientOptions {
   targetUrl: string;
   authToken?: string;
+  username?: string;
+  password?: string;
   timeoutMs?: number;
   maxRetries?: number;
   retryDelayMs?: number;
+}
+
+export interface RequestOverrides {
+  targetUrl?: string;
+  authToken?: string;
+  username?: string;
+  password?: string;
 }
 
 /**
@@ -34,6 +43,8 @@ export class HttpCucmClient implements ICucmEmulatorClient {
   public readonly mode = "http" as const;
   public readonly targetUrl: string;
   private readonly authToken?: string;
+  private readonly username?: string;
+  private readonly password?: string;
   private readonly timeoutMs: number;
   private readonly maxRetries: number;
   private readonly retryDelayMs: number;
@@ -41,6 +52,8 @@ export class HttpCucmClient implements ICucmEmulatorClient {
   constructor(options: HttpCucmClientOptions) {
     this.targetUrl = options.targetUrl.replace(/\/+$/, "");
     this.authToken = options.authToken;
+    this.username = options.username;
+    this.password = options.password;
     this.timeoutMs = options.timeoutMs ?? 10000;
     this.maxRetries = options.maxRetries ?? 3;
     this.retryDelayMs = options.retryDelayMs ?? 300;
@@ -50,9 +63,11 @@ export class HttpCucmClient implements ICucmEmulatorClient {
     method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT",
     endpoint: string,
     body?: unknown,
-    queryParams?: Record<string, unknown>
+    queryParams?: Record<string, unknown>,
+    overrides?: RequestOverrides
   ): Promise<T> {
-    let url = `${this.targetUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+    const baseUrl = (overrides?.targetUrl || this.targetUrl).replace(/\/+$/, "");
+    let url = `${baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
 
     if (queryParams && Object.keys(queryParams).length > 0) {
       const searchParams = new URLSearchParams();
@@ -72,8 +87,15 @@ export class HttpCucmClient implements ICucmEmulatorClient {
       Accept: soap ? "text/xml, multipart/related, */*" : "application/json, text/plain, */*",
     };
 
-    if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
+    const token = overrides?.authToken ?? this.authToken;
+    const user = overrides?.username ?? this.username;
+    const pass = overrides?.password ?? this.password;
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    } else if (user && pass) {
+      const encoded = Buffer.from(`${user}:${pass}`).toString("base64");
+      headers.Authorization = `Basic ${encoded}`;
     }
 
     let payload: string | undefined;
@@ -148,7 +170,7 @@ export class HttpCucmClient implements ICucmEmulatorClient {
       }
     }
 
-    throw new EndpointUnreachableError(this.targetUrl, lastError);
+    throw new EndpointUnreachableError(overrides?.targetUrl || this.targetUrl, lastError);
   }
 
   public async getSummary(): Promise<Record<string, unknown>> {
@@ -187,10 +209,12 @@ export class HttpCucmClient implements ICucmEmulatorClient {
   public async setNodeStatus(
     nodeName: string,
     role?: string,
-    risReturnCode = "Ok"
+    risReturnCode = "Ok",
+    version?: string
   ): Promise<unknown> {
     return this.patchInventory("nodes", nodeName, {
       ...(role ? { role } : {}),
+      ...(version ? { version } : {}),
       risReturnCode,
     });
   }
@@ -265,15 +289,59 @@ export class HttpCucmClient implements ICucmEmulatorClient {
 
     const queryParams: Record<string, unknown> = {};
     const bodyParams: Record<string, unknown> = {};
+    const overrides: RequestOverrides = {};
+
+    // Extract midflight target, auth, and credential overrides
+    if (params.target_url) overrides.targetUrl = String(params.target_url);
+    else if (params.targetUrl) overrides.targetUrl = String(params.targetUrl);
+    else if (params.cucm_host) {
+      const port = params.cucm_port ? `:${params.cucm_port}` : "";
+      const hostStr = String(params.cucm_host);
+      const proto = hostStr.startsWith("http://") || hostStr.startsWith("https://") ? "" : "https://";
+      overrides.targetUrl = `${proto}${hostStr}${port}`;
+    }
+
+    if (params.auth_token) overrides.authToken = String(params.auth_token);
+    else if (params.authToken) overrides.authToken = String(params.authToken);
+    else if (params.bearer_token) overrides.authToken = String(params.bearer_token);
+
+    if (params.cucm_username) overrides.username = String(params.cucm_username);
+    else if (params.username) overrides.username = String(params.username);
+    else if (params.auth && typeof params.auth === "object" && (params.auth as any).username) {
+      overrides.username = String((params.auth as any).username);
+    }
+
+    if (params.cucm_password) overrides.password = String(params.cucm_password);
+    else if (params.password) overrides.password = String(params.password);
+    else if (params.auth && typeof params.auth === "object" && (params.auth as any).password) {
+      overrides.password = String((params.auth as any).password);
+    }
+
+    const overrideKeys = new Set([
+      "target_url",
+      "targetUrl",
+      "cucm_host",
+      "cucm_port",
+      "auth_token",
+      "authToken",
+      "bearer_token",
+      "cucm_username",
+      "username",
+      "cucm_password",
+      "password",
+      "auth",
+    ]);
 
     for (const [key, value] of Object.entries(params)) {
       const placeholder = `{${key}}`;
       if (renderedPath.includes(placeholder)) {
         renderedPath = renderedPath.replace(placeholder, encodeURIComponent(String(value)));
-      } else if (httpMethod === "GET" || httpMethod === "DELETE") {
-        queryParams[key] = value;
-      } else {
-        bodyParams[key] = value;
+      } else if (!overrideKeys.has(key)) {
+        if (httpMethod === "GET" || httpMethod === "DELETE") {
+          queryParams[key] = value;
+        } else {
+          bodyParams[key] = value;
+        }
       }
     }
 
@@ -281,6 +349,6 @@ export class HttpCucmClient implements ICucmEmulatorClient {
       ? (bodyParams.body !== undefined && Object.keys(bodyParams).length === 1 ? bodyParams.body : bodyParams)
       : undefined;
 
-    return this.dispatchRequest(httpMethod, renderedPath, payload, queryParams);
+    return this.dispatchRequest(httpMethod, renderedPath, payload, queryParams, overrides);
   }
 }

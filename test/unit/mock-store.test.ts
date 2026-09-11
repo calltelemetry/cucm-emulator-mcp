@@ -115,4 +115,26 @@ describe("In-Memory CUCM Store (store.ts)", () => {
     store.loadSnapshot(snapshot.manifest.id);
     expect(store.phones.size).toBe(12);
   });
+
+  it("updates cluster version and node versions midflight", () => {
+    const store = new InMemoryCucmStore();
+    expect(store.version).toBe("14.0");
+
+    // Update cluster-wide version
+    store.setVersion("15.0");
+    expect(store.version).toBe("15.0");
+    for (const node of store.nodes.values()) {
+      expect(node.version).toBe("15.0");
+    }
+
+    // Update subscriber version independently
+    store.setNodeStatus("CUCM-SUB1", "subscriber", "Ok", "12.5");
+    expect(store.nodes.get("CUCM-SUB1")?.version).toBe("12.5");
+    expect(store.version).toBe("15.0");
+
+    // Update publisher version updates cluster version as well
+    store.setNodeStatus("CUCM-PUB", "publisher", "Ok", "11.0");
+    expect(store.nodes.get("CUCM-PUB")?.version).toBe("11.0");
+    expect(store.version).toBe("11.0");
+  });
 });

@@ -427,7 +427,7 @@ describe("Adversarial Challenge & Boundary Stress Suite", () => {
     it("3.2 --version and -v exit with code 0 and output package version", async () => {
       const res = await runCli(["--version"]);
       expect(res.code).toBe(0);
-      expect(res.stdout.trim()).toBe("0.2.0");
+      expect(res.stdout.trim()).toBe("0.2.1");
     });
 
     it("3.3 rejects unknown flag with non-zero exit code (1)", async () => {
