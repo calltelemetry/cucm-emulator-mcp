@@ -9,7 +9,8 @@ import type { OpenApiSpec } from "../openapi/types.js";
 export interface SseServerOptions {
   port: number;
   host: string;
-  mcpServer: Server;
+  createMcpServer?: () => Server;
+  mcpServer?: Server;
   registry: ToolRegistry;
   client: ICucmEmulatorClient;
   spec?: OpenApiSpec;
@@ -45,7 +46,7 @@ export class SseServerManager {
       res.status(200).json({
         status: "ok",
         service: "@calltelemetry/cucm-emulator-mcp",
-        version: "0.2.1",
+        version: "0.2.3",
         transport: "sse",
         uptime: process.uptime(),
         toolsCount: this.options.registry.size,
@@ -79,11 +80,22 @@ export class SseServerManager {
         const sessionId = transport.sessionId;
         this.transports.set(sessionId, transport);
 
-        transport.onclose = () => {
+        const server = this.options.createMcpServer
+          ? this.options.createMcpServer()
+          : this.options.mcpServer!;
+
+        let closed = false;
+        const cleanup = () => {
+          if (closed) return;
+          closed = true;
           this.transports.delete(sessionId);
+          void server.close().catch(() => {});
         };
 
-        await this.options.mcpServer.connect(transport);
+        res.on("close", cleanup);
+        transport.onclose = cleanup;
+
+        await server.connect(transport);
       } catch (err: any) {
         console.error("Error establishing SSE transport stream:", err);
         if (!res.headersSent) {

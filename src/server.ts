@@ -58,10 +58,21 @@ export class CucmEmulatorMcpServer {
     }
 
     // Initialize MCP Protocol Server
-    this.server = new Server(
+    this.server = this.createProtocolServer();
+
+    // Hook registry change listener to broadcast MCP notifications
+    this.registry.onToolsChanged(() => {
+      this.broadcastToolsChanged().catch(() => {
+        // Suppress notification delivery error if client is not connected
+      });
+    });
+  }
+
+  public createProtocolServer(): Server {
+    const server = new Server(
       {
         name: "@calltelemetry/cucm-emulator-mcp",
-        version: "0.2.1",
+        version: "0.2.3",
       },
       {
         capabilities: {
@@ -72,19 +83,8 @@ export class CucmEmulatorMcpServer {
       }
     );
 
-    this.setupProtocolHandlers();
-
-    // Hook registry change listener to broadcast MCP notifications
-    this.registry.onToolsChanged(() => {
-      this.broadcastToolsChanged().catch(() => {
-        // Suppress notification delivery error if client is not connected
-      });
-    });
-  }
-
-  private setupProtocolHandlers(): void {
     // 1. ListTools Request Handler
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+    server.setRequestHandler(ListToolsRequestSchema, async () => {
       await this.ensureInitialized();
       return {
         tools: this.registry.listToolDefinitions() as any,
@@ -92,7 +92,7 @@ export class CucmEmulatorMcpServer {
     });
 
     // 2. CallTool Request Handler
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    server.setRequestHandler(CallToolRequestSchema, async (request) => {
       await this.ensureInitialized();
       const { name, arguments: args } = request.params;
       const result = await this.registry.executeTool(name, args || {}, this.client);
@@ -103,9 +103,11 @@ export class CucmEmulatorMcpServer {
     });
 
     // 3. Ping Request Handler
-    this.server.setRequestHandler(PingRequestSchema, async () => {
+    server.setRequestHandler(PingRequestSchema, async () => {
       return {};
     });
+
+    return server;
   }
 
   /**
@@ -186,6 +188,7 @@ export class CucmEmulatorMcpServer {
       this.sseManager = new SseServerManager({
         port: this.config.port,
         host: this.config.host,
+        createMcpServer: () => this.createProtocolServer(),
         mcpServer: this.server,
         registry: this.registry,
         client: this.client,
