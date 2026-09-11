@@ -38,7 +38,7 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     const json = (await res.json()) as any;
     expect(json.status).toBe("ok");
     expect(json.service).toBe("@calltelemetry/cucm-emulator-mcp");
-    expect(json.version).toBe("0.2.1");
+    expect(json.version).toBe("0.2.3");
     expect(json.transport).toBe("sse");
     expect(json.toolsCount).toBeGreaterThanOrEqual(15);
     expect(json.mode).toBe("mock");
@@ -48,7 +48,7 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     expect(resZ.ok).toBe(true);
     const jsonZ = (await resZ.json()) as any;
     expect(jsonZ.status).toBe("ok");
-    expect(jsonZ.version).toBe("0.2.1");
+    expect(jsonZ.version).toBe("0.2.3");
   });
 
   it("serves tool metadata at GET /tools", async () => {
@@ -84,5 +84,18 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
       duration: 15,
     });
     expect(simRes.sessionId).toBeDefined();
+  });
+
+  it("supports successive client connections and reconnects without transport lock", async () => {
+    // Client 1 is already connected in beforeEach. Disconnect client 1:
+    await client.close();
+
+    // Client 2 connects to the same SSE URL:
+    const client2 = new McpTestClient();
+    await client2.connectSse(sseUrl);
+
+    const tools = await client2.listTools();
+    expect(tools.length).toBeGreaterThanOrEqual(15);
+    await client2.close();
   });
 });
