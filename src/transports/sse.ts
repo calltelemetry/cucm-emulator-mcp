@@ -41,16 +41,20 @@ export class SseServerManager {
     });
 
     // Healthcheck endpoint
-    this.app.get("/health", (_req: Request, res: Response) => {
+    const healthHandler = (_req: Request, res: Response) => {
       res.status(200).json({
         status: "ok",
         service: "@calltelemetry/cucm-emulator-mcp",
+        version: "0.2.0",
         transport: "sse",
         uptime: process.uptime(),
         toolsCount: this.options.registry.size,
         mode: this.options.client.mode,
       });
-    });
+    };
+
+    this.app.get("/health", healthHandler);
+    this.app.get("/healthz", healthHandler);
 
     // Tool inventory endpoint
     this.app.get("/tools", (_req: Request, res: Response) => {

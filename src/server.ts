@@ -61,7 +61,7 @@ export class CucmEmulatorMcpServer {
     this.server = new Server(
       {
         name: "@calltelemetry/cucm-emulator-mcp",
-        version: "0.1.3",
+        version: "0.2.0",
       },
       {
         capabilities: {
