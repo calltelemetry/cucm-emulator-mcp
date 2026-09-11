@@ -48,7 +48,7 @@ describe("Integration: Dynamic Spec Reload & Protocol Notifications", () => {
 
     // Register a new custom tool at runtime
     server.registry.register({
-      name: "emu_hot_reload_test_tool",
+      name: "cucm_emulator_hot_reload_test_tool",
       description: "Hot reloaded tool",
       inputSchema: { type: "object" },
       async execute() {
@@ -62,9 +62,9 @@ describe("Integration: Dynamic Spec Reload & Protocol Notifications", () => {
     expect(notificationReceived).toBe(true);
 
     const tools = await client.listTools();
-    expect(tools.some((t) => t.name === "emu_hot_reload_test_tool")).toBe(true);
+    expect(tools.some((t) => t.name === "cucm_emulator_hot_reload_test_tool")).toBe(true);
 
-    const callRes = await client.callToolSuccess("emu_hot_reload_test_tool", {});
+    const callRes = await client.callToolSuccess("cucm_emulator_hot_reload_test_tool", {});
     expect(callRes).toBe("dynamic-result");
   });
 });

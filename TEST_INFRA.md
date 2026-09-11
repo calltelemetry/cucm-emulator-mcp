@@ -51,7 +51,7 @@ test/
 | **Typecheck** | `npm run typecheck` | Strict TypeScript compilation (`tsc --noEmit`) | < 3.0s |
 | **Coverage** | `npm run test:coverage` | Vitest v8 coverage report (100% threshold) | < 12.0s |
 | **E2E Suite** | `npm run test:e2e` | All 4 tiers (`test/e2e/tier*.test.ts`) | < 6.0s |
-| **Tier 1 E2E** | `npx vitest run test/e2e/tier1_features.test.ts` | 15 discrete `emu_*` tools + dynamic OpenAPI ops | < 2.0s |
+| **Tier 1 E2E** | `npx vitest run test/e2e/tier1_features.test.ts` | 15 discrete `cucm_emulator_*` tools + dynamic OpenAPI ops | < 2.0s |
 | **Tier 2 E2E** | `npx vitest run test/e2e/tier2_boundaries.test.ts` | Negative validation, illegal enums, error codes | < 1.5s |
 | **Tier 3 E2E** | `npx vitest run test/e2e/tier3_cross_feature.test.ts` | Multi-step cross-feature workflows | < 2.0s |
 | **Tier 4 E2E** | `npx vitest run test/e2e/tier4_real_world.test.ts` | 50 parallel calls, 1k phones, failover storm | < 3.5s |
@@ -98,13 +98,13 @@ The `McpTestClient` wraps `@modelcontextprotocol/sdk` to provide high-level, str
 ## 5. 4-Tier E2E Test Suite Matrix
 
 ### Tier 1: Feature Coverage in Isolation (`test/e2e/tier1_features.test.ts`)
-- **Domain 1: Fixtures & Topology**: `emu_seed_fixtures`, `emu_reset_store`, `emu_inspect_fixtures`.
-- **Domain 2: Nodes & Health**: `emu_list_nodes`, `emu_set_node_status` (Online, Offline, NotFound).
-- **Domain 3: Phones & Registration**: `emu_list_phones`, `emu_set_phone_status` (Registered, UnRegistered, Rejected), `emu_get_phone_web`.
-- **Domain 4: Call Simulation & Legs**: `emu_simulate_call`, `emu_call_action` (answer, hold, resume, drop), `emu_list_active_calls`.
-- **Domain 5: CURRI / ECC Routing**: `emu_evaluate_curri`, `emu_get_curri_history`.
-- **Domain 6: CDR / CMR Buffers**: `emu_generate_cdrs`, `emu_get_cdr_history`.
-- **Dynamic OpenAPI Operations**: Auto-generated tools (`emu_getSummary`, `emu_querySql`, `emu_getTopology`, `emu_listInventory`, `emu_createCallSession`, `emu_exportCdrCsv`, `emu_loadSnapshot`, etc.).
+- **Domain 1: Fixtures & Topology**: `cucm_emulator_seed_fixtures`, `cucm_emulator_reset_store`, `cucm_emulator_inspect_fixtures`.
+- **Domain 2: Nodes & Health**: `cucm_emulator_list_nodes`, `cucm_emulator_simulate_node_failover` (Online, Offline, NotFound).
+- **Domain 3: Phones & Registration**: `cucm_emulator_list_phones`, `cucm_emulator_set_phone_status` (Registered, UnRegistered, Rejected), `cucm_emulator_get_phone_web`.
+- **Domain 4: Call Simulation & Legs**: `cucm_emulator_simulate_call`, `cucm_emulator_call_action` (answer, hold, resume, drop), `cucm_emulator_list_active_calls`.
+- **Domain 5: CURRI / ECC Routing**: `cucm_emulator_evaluate_curri`, `cucm_emulator_get_curri_history`.
+- **Domain 6: CDR / CMR Buffers**: `cucm_emulator_generate_cdrs`, `cucm_emulator_get_cdr_history`.
+- **Dynamic OpenAPI Operations**: Auto-generated tools (`cucm_emulator_get_summary`, `cucm_emulator_query_sql`, `cucm_emulator_get_topology`, `cucm_emulator_list_inventory`, `cucm_emulator_create_call_session`, `cucm_emulator_export_cdr_csv`, `cucm_emulator_load_snapshot`, etc.).
 
 ### Tier 2: Boundary & Corner Cases (`test/e2e/tier2_boundaries.test.ts`)
 - **Schema Rejections**: Missing required arguments, invalid types (string for number, object for array).

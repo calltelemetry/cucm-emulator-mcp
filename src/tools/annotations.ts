@@ -51,6 +51,11 @@ export function inferToolAnnotations(
   let readOnly = false;
   if (
     method === "GET" ||
+    name.startsWith("cucm_emulator_list_") ||
+    name.startsWith("cucm_emulator_get_") ||
+    name.startsWith("cucm_emulator_inspect_") ||
+    name.startsWith("cucm_emulator_export_") ||
+    name === "cucm_emulator_evaluate_curri" ||
     name.startsWith("emu_list_") ||
     name.startsWith("emu_get_") ||
     name.startsWith("emu_inspect_") ||
@@ -77,6 +82,9 @@ export function inferToolAnnotations(
   if (
     method === "PUT" ||
     method === "DELETE" ||
+    name.startsWith("cucm_emulator_set_") ||
+    name.startsWith("cucm_emulator_upsert_") ||
+    name === "cucm_emulator_simulate_node_failover" ||
     name.startsWith("emu_set_") ||
     name.startsWith("emu_upsert_")
   ) {

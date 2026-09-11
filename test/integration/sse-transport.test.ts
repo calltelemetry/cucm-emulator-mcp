@@ -75,10 +75,10 @@ describe("Integration: SSE Server Transport & Express Endpoints", () => {
     const tools = await client.listTools();
     expect(tools.length).toBeGreaterThanOrEqual(15);
 
-    const inspectRes = await client.callToolSuccess<any>("emu_inspect_fixtures", {});
+    const inspectRes = await client.callToolSuccess<any>("cucm_emulator_inspect_fixtures", {});
     expect(inspectRes.clusterName).toBeDefined();
 
-    const simRes = await client.callToolSuccess<any>("emu_simulate_call", {
+    const simRes = await client.callToolSuccess<any>("cucm_emulator_simulate_call", {
       callingNumber: "1001",
       calledNumber: "1002",
       duration: 15,

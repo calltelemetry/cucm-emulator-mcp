@@ -17,10 +17,10 @@ export const MCP_TOOL_NAME_MAX = 64;
  * Path-derived names for LogCollectionPortTypeService are 72 chars and fail Cursor discovery.
  */
 export const SOAP_SHORT_ALIASES: Record<string, string> = {
-  "/axl/": "emu_axl",
-  "/realtimeservice2/services/RISService70": "emu_ris",
-  "/logcollectionservice2/services/LogCollectionPortTypeService": "emu_dime",
-  "/logcollectionservice/services/DimeGetFileService": "emu_dime_file",
+  "/axl/": "cucm_emulator_axl",
+  "/realtimeservice2/services/RISService70": "cucm_emulator_ris",
+  "/logcollectionservice2/services/LogCollectionPortTypeService": "cucm_emulator_dime",
+  "/logcollectionservice/services/DimeGetFileService": "cucm_emulator_dime_file",
 };
 
 export function soapShortAlias(pathTemplate: string): string | undefined {
@@ -43,8 +43,10 @@ export function sanitizeMcpToolName(name: string): string {
     .replace(/[^a-zA-Z0-9_-]/g, "_")
     .replace(/_+/g, "_")
     .replace(/^_+|_+$/g, "");
-  if (!sanitized) sanitized = "emu_tool";
-  if (!sanitized.startsWith("emu_")) sanitized = `emu_${sanitized}`;
+  if (!sanitized) sanitized = "cucm_emulator_tool";
+  if (!sanitized.startsWith("cucm_emulator_")) {
+    sanitized = `cucm_emulator_${sanitized.replace(/^emu_/, "")}`;
+  }
   if (sanitized.length <= MCP_TOOL_NAME_MAX) return sanitized;
   const digest = createHash("sha1").update(name).digest("hex").slice(0, 8);
   const budget = MCP_TOOL_NAME_MAX - 1 - digest.length;
@@ -69,8 +71,8 @@ export function deriveToolName(operationId?: string, method = "GET", pathTemplat
   if (alias) return alias;
 
   if (operationId) {
-    const snake = toSnakeCase(operationId);
-    return sanitizeMcpToolName(snake.startsWith("emu_") ? snake : `emu_${snake}`);
+    const snake = toSnakeCase(operationId).replace(/^emu_/, "");
+    return sanitizeMcpToolName(snake.startsWith("cucm_emulator_") ? snake : `cucm_emulator_${snake}`);
   }
 
   // Fallback: derive from method and path
@@ -80,7 +82,7 @@ export function deriveToolName(operationId?: string, method = "GET", pathTemplat
     .replace(/[^a-zA-Z0-9_]/g, "_");
 
   return sanitizeMcpToolName(
-    `emu_${toSnakeCase(method)}_${toSnakeCase(sanitizedPath)}`.replace(/_+/g, "_")
+    `cucm_emulator_${toSnakeCase(method)}_${toSnakeCase(sanitizedPath)}`.replace(/_+/g, "_")
   );
 }
 

@@ -133,7 +133,7 @@ describe("Adversarial Schema, Concurrency & Protocol Abuse Suite", () => {
 
     it("2.1 handles 50 parallel simultaneous call simulations without state corruption", async () => {
       const promises = Array.from({ length: 50 }, (_, i) =>
-        mcpClient.callToolSuccess("emu_simulate_call", {
+        mcpClient.callToolSuccess("cucm_emulator_simulate_call", {
           callingNumber: `10${String(i).padStart(2, "0")}`,
           calledNumber: `20${String(i).padStart(2, "0")}`,
           duration: 10 + (i % 5),
@@ -150,21 +150,21 @@ describe("Adversarial Schema, Concurrency & Protocol Abuse Suite", () => {
       }
 
       // Verify active calls list reflects concurrent calls
-      const activeCalls = (await mcpClient.callToolSuccess("emu_list_active_calls", {})) as any[];
+      const activeCalls = (await mcpClient.callToolSuccess("cucm_emulator_list_active_calls", {})) as any[];
       expect(activeCalls.length).toBeGreaterThanOrEqual(50);
     });
 
     it("2.2 handles simultaneous CRUD operations on phone inventory", async () => {
       const phoneCount = 20;
       const upsertPromises = Array.from({ length: phoneCount }, (_, i) =>
-        mcpClient.callToolSuccess("emu_set_phone_status", {
+        mcpClient.callToolSuccess("cucm_emulator_set_phone_status", {
           phoneName: `SEP0011223344${String(i).padStart(2, "0")}`,
           status: i % 2 === 0 ? "Registered" : "UnRegistered",
         }).catch(() => null)
       );
 
       await Promise.all(upsertPromises);
-      const summary = (await mcpClient.callToolSuccess("emu_inspect_fixtures", {})) as any;
+      const summary = (await mcpClient.callToolSuccess("cucm_emulator_inspect_fixtures", {})) as any;
       expect(summary.clusterName).toBeDefined();
     });
   });
@@ -199,12 +199,12 @@ describe("Adversarial Schema, Concurrency & Protocol Abuse Suite", () => {
       expect(result.message).toContain("not found in MCP registry");
 
       // Verify server remains responsive
-      const pingRes = await mcpClient.callToolSuccess("emu_inspect_fixtures", {});
+      const pingRes = await mcpClient.callToolSuccess("cucm_emulator_inspect_fixtures", {});
       expect(pingRes).toBeDefined();
     });
 
     it("3.2 calling tool with invalid schema types returns validation error", async () => {
-      const errorResult = await mcpClient.callToolError("emu_simulate_call", {
+      const errorResult = await mcpClient.callToolError("cucm_emulator_simulate_call", {
         callingNumber: 12345, // number instead of string
         calledNumber: { bad: "object" }, // object instead of string
         duration: "not-a-number",

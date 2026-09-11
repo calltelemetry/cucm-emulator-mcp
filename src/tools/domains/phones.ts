@@ -3,10 +3,10 @@ import type { McpTool, McpToolResult } from "../types.js";
 import { inferToolAnnotations } from "../annotations.js";
 
 /**
- * emu_list_phones: Lists phones with registration status, IP address, MAC, and lines.
+ * cucm_emulator_list_phones: Lists phones with registration status, IP address, MAC, and lines.
  */
-export const emuListPhonesTool: McpTool = {
-  name: "emu_list_phones",
+export const cucmEmulatorListPhonesTool: McpTool = {
+  name: "cucm_emulator_list_phones",
   description: "Lists configured and registered Cisco IP phone endpoints with their line numbers, MAC addresses, firmware, and registration status.",
   inputSchema: {
     type: "object",
@@ -35,7 +35,7 @@ export const emuListPhonesTool: McpTool = {
     },
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_list_phones", "GET", ["phones"]),
+  annotations: inferToolAnnotations("cucm_emulator_list_phones", "GET", ["phones"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const phones = await client.listInventory("phones", args);
@@ -52,10 +52,10 @@ export const emuListPhonesTool: McpTool = {
 };
 
 /**
- * emu_set_phone_status: Updates phone registration state (Registered, UnRegistered, Rejected).
+ * cucm_emulator_set_phone_status: Updates phone registration state (Registered, UnRegistered, Rejected).
  */
-export const emuSetPhoneStatusTool: McpTool = {
-  name: "emu_set_phone_status",
+export const cucmEmulatorSetPhoneStatusTool: McpTool = {
+  name: "cucm_emulator_set_phone_status",
   description: "Updates the registration status of a specific Cisco IP phone (Registered, UnRegistered, Rejected) in the RISDB projection.",
   inputSchema: {
     type: "object",
@@ -73,7 +73,7 @@ export const emuSetPhoneStatusTool: McpTool = {
     required: ["phoneName", "status"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_set_phone_status", "POST", ["phones"]),
+  annotations: inferToolAnnotations("cucm_emulator_set_phone_status", "POST", ["phones"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const phoneName = String(args.phoneName);
@@ -92,10 +92,10 @@ export const emuSetPhoneStatusTool: McpTool = {
 };
 
 /**
- * emu_get_phone_web: Scrapes/fetches phone web server pages (XML, HTML, JSON).
+ * cucm_emulator_get_phone_web: Scrapes/fetches phone web server pages (XML, HTML, JSON).
  */
-export const emuGetPhoneWebTool: McpTool = {
-  name: "emu_get_phone_web",
+export const cucmEmulatorGetPhoneWebTool: McpTool = {
+  name: "cucm_emulator_get_phone_web",
   description: "Retrieves serviceability, network configuration, or XML execute web responses from a simulated Cisco IP phone endpoint.",
   inputSchema: {
     type: "object",
@@ -117,7 +117,7 @@ export const emuGetPhoneWebTool: McpTool = {
     required: ["phoneNameOrIp"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_get_phone_web", "GET", ["phones"]),
+  annotations: inferToolAnnotations("cucm_emulator_get_phone_web", "GET", ["phones"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const phoneNameOrIp = String(args.phoneNameOrIp);
@@ -136,8 +136,8 @@ export const emuGetPhoneWebTool: McpTool = {
   },
 };
 
-export const emuGetPhoneScreenshotTool: McpTool = {
-  name: "emu_get_phone_screenshot",
+export const cucmEmulatorGetPhoneScreenshotTool: McpTool = {
+  name: "cucm_emulator_get_phone_screenshot",
   description:
     "Fetches the Cisco IP Phone CGI screenshot from /emulated-phone/{name}/CGI/Screenshot (BMP when authenticated; CiscoIPPhoneError Number=4 without auth on the live emulator).",
   inputSchema: {
@@ -155,7 +155,7 @@ export const emuGetPhoneScreenshotTool: McpTool = {
     required: ["phoneNameOrIp"],
     additionalProperties: false,
   },
-  annotations: inferToolAnnotations("emu_get_phone_screenshot", "GET", ["phones"]),
+  annotations: inferToolAnnotations("cucm_emulator_get_phone_screenshot", "GET", ["phones"]),
   async execute(args: Record<string, unknown>, client: ICucmEmulatorClient): Promise<McpToolResult> {
     try {
       const phoneNameOrIp = String(args.phoneNameOrIp);
@@ -173,9 +173,15 @@ export const emuGetPhoneScreenshotTool: McpTool = {
   },
 };
 
+// Aliases for backwards compatibility
+export const emuListPhonesTool = cucmEmulatorListPhonesTool;
+export const emuSetPhoneStatusTool = cucmEmulatorSetPhoneStatusTool;
+export const emuGetPhoneWebTool = cucmEmulatorGetPhoneWebTool;
+export const emuGetPhoneScreenshotTool = cucmEmulatorGetPhoneScreenshotTool;
+
 export const phonesDomainTools: McpTool[] = [
-  emuListPhonesTool,
-  emuSetPhoneStatusTool,
-  emuGetPhoneWebTool,
-  emuGetPhoneScreenshotTool,
+  cucmEmulatorListPhonesTool,
+  cucmEmulatorSetPhoneStatusTool,
+  cucmEmulatorGetPhoneWebTool,
+  cucmEmulatorGetPhoneScreenshotTool,
 ];

@@ -15,15 +15,15 @@ describe("Schema Builder & Parameter Merger (schema-builder.ts)", () => {
     expect(toSnakeCase("Cucm-Phone-Status")).toBe("cucm_phone_status");
   });
 
-  it("derives clean tool names prefixed with emu_", () => {
-    expect(deriveToolName("getSummary")).toBe("emu_get_summary");
-    expect(deriveToolName("emu_simulate_call")).toBe("emu_simulate_call");
-    expect(deriveToolName(undefined, "POST", "/api/v2/inventory/{resource}")).toBe("emu_post_inventory_by_resource");
-    expect(deriveToolName(undefined, "POST", "/axl/")).toBe("emu_axl");
-    expect(deriveToolName(undefined, "POST", "/realtimeservice2/services/RISService70")).toBe("emu_ris");
-    expect(deriveToolName(undefined, "POST", "/logcollectionservice2/services/LogCollectionPortTypeService")).toBe("emu_dime");
-    expect(deriveToolName(undefined, "POST", "/logcollectionservice/services/DimeGetFileService")).toBe("emu_dime_file");
-    expect(sanitizeMcpToolName("emu_post_logcollectionservice2_services_log_collection_port_type_service").length).toBeLessThanOrEqual(64);
+  it("derives clean tool names prefixed with cucm_emulator_", () => {
+    expect(deriveToolName("getSummary")).toBe("cucm_emulator_get_summary");
+    expect(deriveToolName("emu_simulate_call")).toBe("cucm_emulator_simulate_call");
+    expect(deriveToolName(undefined, "POST", "/api/v2/inventory/{resource}")).toBe("cucm_emulator_post_inventory_by_resource");
+    expect(deriveToolName(undefined, "POST", "/axl/")).toBe("cucm_emulator_axl");
+    expect(deriveToolName(undefined, "POST", "/realtimeservice2/services/RISService70")).toBe("cucm_emulator_ris");
+    expect(deriveToolName(undefined, "POST", "/logcollectionservice2/services/LogCollectionPortTypeService")).toBe("cucm_emulator_dime");
+    expect(deriveToolName(undefined, "POST", "/logcollectionservice/services/DimeGetFileService")).toBe("cucm_emulator_dime_file");
+    expect(sanitizeMcpToolName("cucm_emulator_post_logcollectionservice2_services_log_collection_port_type_service").length).toBeLessThanOrEqual(64);
     expect(deriveToolName("postLogCollectionService2ServicesLogCollectionPortTypeService").length).toBeLessThanOrEqual(64);
   });
 
@@ -99,7 +99,7 @@ describe("Schema Builder & Parameter Merger (schema-builder.ts)", () => {
 
     const merged = buildOperationSchema("/api/v2/clusters/{clusterId}/calls", "POST", operation, spec);
 
-    expect(merged.toolName).toBe("emu_simulate_call_session");
+    expect(merged.toolName).toBe("cucm_emulator_simulate_call_session");
     expect(merged.httpMethod).toBe("POST");
     expect(merged.pathParamNames).toEqual(["clusterId"]);
     expect(merged.queryParamNames).toEqual(["dryRun"]);

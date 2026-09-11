@@ -24,47 +24,47 @@ All tests run completely offline and deterministically with:
 ### Tier 1: Feature Coverage in Isolation (`test/e2e/tier1_features.test.ts`)
 *35 tests passing (100%)* — Verifies primary behavior and interface contracts across all 6 domain areas and dynamic OpenAPI operations:
 - **Domain 1: Fixtures & Topology** (5 tests):
-  - `emu_seed_fixtures` (lab-small default dual-node cluster and 12 phones).
-  - `emu_seed_fixtures` (custom phone count and seed parameters).
-  - `emu_reset_store` (pristine state restoration).
-  - `emu_inspect_fixtures` (summary counts and cluster version verification).
+  - `cucm_emulator_seed_fixtures` (lab-small default dual-node cluster and 12 phones).
+  - `cucm_emulator_seed_fixtures` (custom phone count and seed parameters).
+  - `cucm_emulator_reset_store` (pristine state restoration).
+  - `cucm_emulator_inspect_fixtures` (summary counts and cluster version verification).
   - HTTP backend fixture seeding and store reset.
 - **Domain 2: Nodes & Cluster Health** (5 tests):
-  - `emu_list_nodes` (publisher and subscriber roles, IPv4 addresses, versions).
-  - `emu_set_node_status` (subscriber failover to `NotFound` for ADR 0120/0122).
-  - `emu_set_node_status` (restoring subscriber to `Ok`).
+  - `cucm_emulator_list_nodes` (publisher and subscriber roles, IPv4 addresses, versions).
+  - `cucm_emulator_simulate_node_failover` (subscriber failover to `NotFound` for ADR 0120/0122).
+  - `cucm_emulator_simulate_node_failover` (restoring subscriber to `Ok`).
   - HTTP backend node status mutation.
   - CallManager Group priority and high availability membership verification.
 - **Domain 3: Phones & Registration** (5 tests):
-  - `emu_list_phones` (MAC naming format, line numbers, IP assignments).
-  - `emu_set_phone_status` (unregistration and RIS status reflection).
-  - `emu_set_phone_status` (rejection status).
-  - `emu_get_phone_web` (XML and HTML serviceability web scrapes).
+  - `cucm_emulator_list_phones` (MAC naming format, line numbers, IP assignments).
+  - `cucm_emulator_set_phone_status` (unregistration and RIS status reflection).
+  - `cucm_emulator_set_phone_status` (rejection status).
+  - `cucm_emulator_get_phone_web` (XML and HTML serviceability web scrapes).
   - HTTP backend phone status filtering.
 - **Domain 4: Call Simulation & Legs** (5 tests):
-  - `emu_simulate_call` (RTP media metrics, packet loss, and CDR creation).
-  - `emu_call_action` (answer, hold, resume, drop lifecycle progression).
-  - `emu_list_active_calls` (active call session filtering).
+  - `cucm_emulator_simulate_call` (RTP media metrics, packet loss, and CDR creation).
+  - `cucm_emulator_call_action` (answer, hold, resume, drop lifecycle progression).
+  - `cucm_emulator_list_active_calls` (active call session filtering).
   - HTTP backend call simulation.
   - Call routing to external PSTN via Route Pattern / SIP Trunk.
 - **Domain 5: CURRI / ECC Policy Routing** (5 tests):
-  - `emu_evaluate_curri` (permit policy for authorized internal calls).
-  - `emu_evaluate_curri` (deny policy for blacklisted destination prefix).
-  - `emu_evaluate_curri` (divert policy redirecting to security desk).
-  - `emu_get_curri_history` (audit log retrieval).
+  - `cucm_emulator_evaluate_curri` (permit policy for authorized internal calls).
+  - `cucm_emulator_evaluate_curri` (deny policy for blacklisted destination prefix).
+  - `cucm_emulator_evaluate_curri` (divert policy redirecting to security desk).
+  - `cucm_emulator_get_curri_history` (audit log retrieval).
   - HTTP backend CURRI evaluation.
 - **Domain 6: CDR / CMR Buffers** (5 tests):
-  - `emu_generate_cdrs` (normal traffic burst).
-  - `emu_generate_cdrs` (abandoned call records).
-  - `emu_generate_cdrs` (CURRI-blocked pattern records).
-  - `emu_get_cdr_history` (CSV export formatting).
+  - `cucm_emulator_generate_cdrs` (normal traffic burst).
+  - `cucm_emulator_generate_cdrs` (abandoned call records).
+  - `cucm_emulator_generate_cdrs` (CURRI-blocked pattern records).
+  - `cucm_emulator_get_cdr_history` (CSV export formatting).
   - HTTP backend CDR generation and retrieval.
 - **Dynamic OpenAPI Operations** (5 tests):
-  - `emu_get_summary` (cluster health and active counters).
-  - `emu_query_sql` (direct SQL query execution).
-  - `emu_list_inventory` & `emu_upsert_inventory` (generic resource CRUD).
-  - `emu_export_snapshot` & `emu_load_snapshot` (state snapshot lifecycle).
-  - `emu_export_cdr_csv` (raw CSV stream export).
+  - `cucm_emulator_get_summary` (cluster health and active counters).
+  - `cucm_emulator_query_sql` (direct SQL query execution).
+  - `cucm_emulator_list_inventory` & `cucm_emulator_upsert_inventory` (generic resource CRUD).
+  - `cucm_emulator_export_snapshot` & `cucm_emulator_load_snapshot` (state snapshot lifecycle).
+  - `cucm_emulator_export_cdr_csv` (raw CSV stream export).
 
 ---
 
